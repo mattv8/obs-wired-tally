@@ -48,7 +48,9 @@ sudo chmod u+rw,g+rw-x,o-rwx /home/pi/tally.xml`
 	
 ```
 sudo nano /etc/rc.local
-just above line 'exit 0' insert:
+```
+Just above line 'exit 0' insert:
+```
 sudo python /home/pi/tally.py &
 ```
 
