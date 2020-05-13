@@ -5,49 +5,59 @@ Wireless Tally -- Installed on Raspberry Pi -- RPi Directory
 ----------------------------
 
 This project is to make a Raspberry pi into a wireless OBS tally light.
-This is tested on a pi V1 with a wireless USB module for a wireless connection.
-see https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
+This is tested on a Raspberry Pi Zero W running Raspbian (non-desktop).
+See https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
 
 For other pi models use other pin numbers and change tally.py
 The red led and green led are connected with a 330ohm resistor.
-see https://gpiozero.readthedocs.io/en/stable/
+See https://gpiozero.readthedocs.io/en/stable/.
 
 1. Install obs-websocket plugin to OBS
 
-2. Install on the pi:
-- gpiozero
-	sudo apt-get install python-gpiozero
-	(sudo apt-get install python3-gpiozero)
-- nginx and php
-	see https://www.raspberrypi.org/documentation/remote-access/web-server/nginx.md
-- php-xml
-	sudo apt-get install php-xml
+2. Install program dependencies on the pi:
+```
+sudo apt-get install python-gpiozero php-xml nginx php-fpm -y
+```
+*For more info on nginx and php see https://www.raspberrypi.org/documentation/remote-access/web-server/nginx.md*
 
-install in /home/pi/
-	tally.py
-	tally.xml
-install in /var/www/html/
-	index.php
-	gpio.php (for testing led)
+**Install Directories**
 
-set permissions in /var/www/
-	sudo chown -R pi:www-data /var/www
-	sudo chmod u+rwx,g+srw-x,o-rwx /var/www/
-	sudo chmod u+rw,g+r-xw,o-rwx /var/www/html/index.php
-set permissions in /home/pi/
-	sudo chmod u+rw,g+rw-x,o-rwx /home/pi/tally.xml
+Place the following files in /home/pi/:
+* tally.py
+* tally.xml
 
-3. To make the python script start at boot:
-	see https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/
-	sudo nano /etc/rc.local
-	just above line 'exit 0' insert:
-	sudo python /home/pi/tally.py &
-	don't forget the & at the end for running it as a daemon
+Place the following files in /var/www/html/:
+* index.php
+* gpio.php (for testing led)
+
+**Permissions**
+
+Set permissions for /var/www/
+```
+sudo chown -R pi:www-data /var/www
+sudo chmod u+rwx,g+srw-x,o-rwx /var/www/
+sudo chmod u+rw,g+r-xw,o-rwx /var/www/html/index.php
+```
+
+Set permissions for /home/pi/
+```
+sudo chmod u+rw,g+rw-x,o-rwx /home/pi/tally.xml`
+```
+
+3. To make the python script start at boot (more info at https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/):
 	
-after starting the pi with the script running in background go to:
-(Use ipscan24 to find the pi on the network.)
+```
+sudo nano /etc/rc.local
+just above line 'exit 0' insert:
+sudo python /home/pi/tally.py &
+```
+
+Don't forget the & at the end for running it as a daemon. After starting the pi with the script running in background, in a browser go to (Use ipscan24 to find the pi on the network.):
+    
 http://<pi IP address>/gpio.php for testing the led.
+
 http://<pi IP address>/index.php for configuring the 'tally'
+
 After configuring the 'tally' reboot the pi.
 
 Next project steps:
@@ -81,10 +91,10 @@ How to install
 
 test: driverino
 
-Source code can be found in Arduino/Source
+Source code can be found in Arduino/Source. .NET can be developed in Visual Studio.
 
 Credits
 -----------------------------
--Project ideas from the following OBS forum thread: https://obsproject.com/forum/threads/live-cameara-led.73922/
--RPi portion forked from https://github.com/peterfdej/OBSpiTally
--Arduino portion forked from https://boprograms.eu/obsTally/.)
+- Project ideas from the following OBS forum thread: https://obsproject.com/forum/threads/live-cameara-led.73922/
+- RPi portion forked from https://github.com/peterfdej/OBSpiTally
+- Arduino portion forked from https://boprograms.eu/obsTally/.)
