@@ -16,7 +16,8 @@ See https://gpiozero.readthedocs.io/en/stable/.
 
 2. Install program dependencies on the pi:
 ```
-sudo apt-get install python-gpiozero php-xml nginx php-fpm -y
+sudo apt update
+sudo apt install python-gpiozero php-xml nginx php-fpm -y
 ```
 *For more info on nginx and php see https://www.raspberrypi.org/documentation/remote-access/web-server/nginx.md*
 
