@@ -83,4 +83,8 @@ test: driverino
 
 Source code can be found in Arduino/Source
 
-(RPi portion forked from https://github.com/peterfdej/OBSpiTally and Arduino portion forked from https://boprograms.eu/obsTally/.)
+Credits
+-----------------------------
+-Project ideas from the following OBS forum thread: https://obsproject.com/forum/threads/live-cameara-led.73922/
+-RPi portion forked from https://github.com/peterfdej/OBSpiTally
+-Arduino portion forked from https://boprograms.eu/obsTally/.)
