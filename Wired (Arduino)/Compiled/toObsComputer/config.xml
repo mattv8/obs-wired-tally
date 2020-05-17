@@ -1,0 +1,8 @@
+<root>
+  <Setup state="completed" />
+  <Websocket password="" />
+  <Source1 name="Cam1" />
+  <Source2 name="Cam2" />
+  <Source3 name="Cam3" />
+  <Source4 name="Cam4" />
+</root>

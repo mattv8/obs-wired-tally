@@ -2,17 +2,9 @@
 //    SW-001 Software, Arduino Script for wired OBS Tally Light    //
 /////////////////////////////////////////////////////////////////////
 //
-//  Original resp. engineer:
-//  Matthew P. Visnovsky
+//  Written by: Matthew P. Visnovsky
+//  Adapted from https://boprograms.eu/obsTally/.
 //
-//  Last modified by:
-//  Matthew P. Visnovsky
-//
-//  #### CHANGE LOG ####
-//  FROM | TO | BRIEF DESCRIPTION OF CHANGES
-//  -    | A  | Initial release.
-//       |    | 
-//       |    |
 //
 #include "FastLED.h" //Using FastLED Library https://github.com/FastLED/FastLED
 
@@ -33,6 +25,10 @@ unsigned long pastTime = 0; // Set pastTime to 0. Don't redefine this anywhere o
 #define BRIGHTNESS  255
 
 CRGB leds[NUM_LEDS];
+
+//OBS Variables
+char currentScene;
+char lastScene;
 
 // ------------------------FUNCTIONS------------------------ //
 
@@ -56,15 +52,64 @@ void setup() {
 
 }//End Setup Loop
 
-
 // ------------------------VOID LOOP------------------------------- //
 void loop(void) {
   
   ////////////// Perpetually Updating ///////////////
   currentTime = millis(); // Update the master clock
 
-  for( int i = 0 ; i < NUM_LEDS; i++) { leds[i] = CRGB::Red; }
-    
-  FastLED.show(); 
+  //for( int i = 0 ; i < NUM_LEDS; i++) { leds[i] = CRGB::Red; }
+  //FastLED.show(); 
 
+  if(Serial.available()) { // Check if recieving data
+	  
+    currentScene = Serial.read(); //Read in serial bits
+    
+    if(currentScene != lastScene) { //If scene state changes
+      
+      FastLED.clear();  //Clear all pixel data
+      
+      // Live //
+      if (currentScene == '1') {
+        leds[1] = CRGB::Red;
+      }
+      else if (currentScene == '2') {
+        leds[2] = CRGB::Red;
+      }
+      else if (currentScene == '3') {
+        leds[3] = CRGB::Red;
+      }
+      else if (currentScene == '4') {
+        leds[4] = CRGB::Red;
+      }
+      else if (currentScene == '5') {
+        leds[5] = CRGB::Red;
+      }
+
+  	  // Preview Range //
+      if (currentScene == '6') {
+        leds[1] = CRGB::Green;
+      }
+      else if (currentScene == '7') {
+        leds[2] = CRGB::Green;
+      }
+      else if (currentScene == '8') {
+        leds[3] = CRGB::Green;
+      }
+      else if (currentScene == '9') {
+        leds[4] = CRGB::Green;
+      }
+      else if (currentScene == 'n') {
+        leds[5] = CRGB::Green;
+      }
+      
+      lastScene = currentScene; // Update scene state
+      FastLED.show(); // Update LED's
+    
+    }//End scene state check
+  
+  }//End Serial.available()
+  
+  delay(1); //Simple debounce delay
+  
 }//End Void Loop

@@ -83,7 +83,7 @@ Note: This is a .NET app and only runs on Windows
 
 How to install
 1. Wire up the LEDs to your Arduino
-2. Scene 1 is PIN 12, Scene 2, 11, 3-10, 4-9 (pin 8 is for "out of range")
+2. Scene 1 is PIN 12, Scene 2 is pin 11, 3 is 10, 4 is 9 (pin 8 is for "out of range")
 3. For preview use PINs 7, 6, 5, 4 (and pin 3 is for preview "out of range")
 
 4. Content from folder "toArduino" should be compiled and uploaded onto your Arduino.

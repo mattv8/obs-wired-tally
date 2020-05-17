@@ -1,8 +1,0 @@
-<root>
-  <Setup state="notSet" />
-  <Websocket password="notSet" />
-  <Source1 name="notSet" />
-  <Source2 name="notSet" />
-  <Source3 name="notSet" />
-  <Source4 name="notSet" />
-</root>
