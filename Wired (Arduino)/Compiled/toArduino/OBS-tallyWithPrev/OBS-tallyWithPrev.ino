@@ -27,11 +27,31 @@ unsigned long pastTime = 0; // Set pastTime to 0. Don't redefine this anywhere o
 CRGB leds[NUM_LEDS];
 
 //OBS Variables
-char currentScene;
-char lastScene;
+int SerialInt = 0;  // Global array for Serial integer. Initialize at 0.
+int currentLive;
+int lastLive;
+int currentPreview;
+int lastPreview;
 
 // ------------------------FUNCTIONS------------------------ //
-
+// Camera Serial Function //
+// Note: This function reads serial data received from the camera and stores it
+//       as an integer in the global variable SerialInt.
+// CAUTION: Be careful with the atoi() function!! It will yield strange behavior in void loop.
+void ReadSerial() {// Change to int if want to return integer  
+  int i = 0;
+  char SerialString[2] = "";// Clear variable.
+  if(Serial.available()){
+      while(Serial.available()){
+        SerialString[i] = Serial.read();
+        i++;
+        delay(1); //Necessary delay as sometimes serial becomes unavailable for a short moment.
+      }
+      SerialInt = atoi(SerialString);// Convert string to int
+      Serial.print("Received from serial: "); //[for debugging]
+      Serial.println(SerialInt); //[for debugging]
+    }
+}
 
 // ------------------------SETUP LOOP------------------------------- //
 void setup() {
@@ -56,60 +76,56 @@ void setup() {
 void loop(void) {
   
   ////////////// Perpetually Updating ///////////////
-  currentTime = millis(); // Update the master clock
+  //currentTime = millis(); // Update the master clock
 
-  //for( int i = 0 ; i < NUM_LEDS; i++) { leds[i] = CRGB::Red; }
-  //FastLED.show(); 
 
+  ////////////// Serial Communication ///////////////
   if(Serial.available()) { // Check if recieving data
-	  
-    currentScene = Serial.read(); //Read in serial bits
     
-    if(currentScene != lastScene) { //If scene state changes
+    //ReadSerial(); // Record serial bits using custom function.
+    SerialInt = Serial.parseInt();
       
-      FastLED.clear();  //Clear all pixel data
-      
-      // Live //
-      if (currentScene == '1') {
-        leds[1] = CRGB::Red;
-      }
-      else if (currentScene == '2') {
-        leds[2] = CRGB::Red;
-      }
-      else if (currentScene == '3') {
-        leds[3] = CRGB::Red;
-      }
-      else if (currentScene == '4') {
-        leds[4] = CRGB::Red;
-      }
-      else if (currentScene == '5') {
-        leds[5] = CRGB::Red;
-      }
-
-  	  // Preview Range //
-      if (currentScene == '6') {
-        leds[1] = CRGB::Green;
-      }
-      else if (currentScene == '7') {
-        leds[2] = CRGB::Green;
-      }
-      else if (currentScene == '8') {
-        leds[3] = CRGB::Green;
-      }
-      else if (currentScene == '9') {
-        leds[4] = CRGB::Green;
-      }
-      else if (currentScene == 'n') {
-        leds[5] = CRGB::Green;
-      }
-      
-      lastScene = currentScene; // Update scene state
-      FastLED.show(); // Update LED's
+    // Live Range //
+    if ((SerialInt>=1) && (SerialInt<=5)){ //If within live range
+      currentLive = SerialInt; // Update live state
+    }
     
-    }//End scene state check
-  
+    // Preview Range //
+    if ((SerialInt>=6) && (SerialInt<=10)){ //If within preview range
+      currentPreview = SerialInt-5; // Update preview state
+    }
+  }else { //If not recieving any data
+    for( int i = 0 ; i < NUM_LEDS; i++) { leds[i] = CRGB::Gray; }
+    FastLED.show();
   }//End Serial.available()
+
+
+  ////////////// Tally Light States ///////////////
+  // Preview //
+  if(currentPreview != lastPreview && currentPreview != currentLive) { //If preview state changes & not currently live
+      FastLED.clear(); // Clear all pixel data
+      if (currentPreview == 1) {
+        //FastLED.clear(); // Clear all pixel data
+        for( int i = 0 ; i < NUM_LEDS; i++) { leds[i] = CRGB::Green; }
+        //Serial.print("Current preview:" ); Serial.println(currentPreview);
+      }
+    }else{
+      FastLED.clear(); // Clear all pixel data
+    lastPreview = currentPreview; //Update preview state
+  }
+
+  // Live //
+  //if(currentLive != lastLive) { //If live state changes
+    //FastLED.clear(); // Clear all pixel data
+      if (currentLive == 1) {
+        //FastLED.clear(); // Clear all pixel data
+        for( int i = 0 ; i < NUM_LEDS; i++) { leds[i] = CRGB::Red; }
+        //Serial.print("Current scene:" ); Serial.println(currentLive);
+      }
+    lastLive = currentLive; //Update live state
+  //}
   
-  delay(1); //Simple debounce delay
+  FastLED.show(); //Update all LED states
+  //delay(10); //Simple debounce delay
   
 }//End Void Loop
