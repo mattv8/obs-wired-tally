@@ -186,7 +186,7 @@ namespace OBSTallyClient
                 }
                 catch
                 {
-                    //MessageBox.Show("Could not establish serial connection on " + comboBox1.Text, "Communication Error");
+                    //MessageBox.Show("Could not connect to OBS Websocket. Is OBS running?","OBS Websocket Error");
                 }
 
 
