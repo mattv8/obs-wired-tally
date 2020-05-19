@@ -34,24 +34,7 @@ int currentPreview;
 int lastPreview;
 
 // ------------------------FUNCTIONS------------------------ //
-// Camera Serial Function //
-// Note: This function reads serial data received from the camera and stores it
-//       as an integer in the global variable SerialInt.
-// CAUTION: Be careful with the atoi() function!! It will yield strange behavior in void loop.
-void ReadSerial() {// Change to int if want to return integer  
-  int i = 0;
-  char SerialString[2] = "";// Clear variable.
-  if(Serial.available()){
-      while(Serial.available()){
-        SerialString[i] = Serial.read();
-        i++;
-        delay(1); //Necessary delay as sometimes serial becomes unavailable for a short moment.
-      }
-      SerialInt = atoi(SerialString);// Convert string to int
-      Serial.print("Received from serial: "); //[for debugging]
-      Serial.println(SerialInt); //[for debugging]
-    }
-}
+
 
 // ------------------------SETUP LOOP------------------------------- //
 void setup() {
@@ -95,7 +78,7 @@ void loop(void) {
       currentPreview = SerialInt-5; // Update preview state
     }
   }else { //If not recieving any data
-    for( int i = 0 ; i < NUM_LEDS; i++) { leds[i] = CRGB::Gray; }
+    for( int i = 0; i < NUM_LEDS; i++) { leds[i] = CRGB::Gray; }
     FastLED.show();
   }//End Serial.available()
 
