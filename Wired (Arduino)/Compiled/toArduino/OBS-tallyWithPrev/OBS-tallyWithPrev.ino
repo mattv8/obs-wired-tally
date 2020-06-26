@@ -22,9 +22,10 @@ unsigned long pastTime = 0; // Set pastTime to 0. Don't redefine this anywhere o
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 #define NUM_LEDS    7
+#define NUM_ARRAYS  4
 #define BRIGHTNESS  255
-
-CRGB leds[NUM_LEDS];
+uint8_t LED[NUM_ARRAYS][NUM_LEDS]; //preallocate LED arrays
+CRGB leds[NUM_LEDS*NUM_ARRAYS];
 
 //OBS Variables
 int SerialInt = 0;  // Global array for Serial integer. Initialize at 0.
@@ -39,6 +40,15 @@ int lastPreview;
 // ------------------------SETUP LOOP------------------------------- //
 void setup() {
 
+  // Prints LED array for debugging
+  for( int j=0; j<NUM_ARRAYS; j++){
+  for( int i=0; i<NUM_LEDS; i++) {Serial.print(LED[j][i]);}
+  Serial.println();
+  }
+
+  // Build LED variable
+  for( int i=0; i<NUM_LEDS; i++) { LED[NUM_ARRAYS][i] = i; }
+  
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS)
     .setCorrection(TypicalLEDStrip)
@@ -57,10 +67,9 @@ void setup() {
 
 // ------------------------VOID LOOP------------------------------- //
 void loop(void) {
-  
+
   ////////////// Perpetually Updating ///////////////
   //currentTime = millis(); // Update the master clock
-
 
   ////////////// Serial Communication ///////////////
   if(Serial.available()) { // Check if recieving data
