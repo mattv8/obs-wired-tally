@@ -62,6 +62,8 @@ void setup() {
   // Pin digital writes //
   digitalWrite(Vout,HIGH); // Give power to the LED
 
+  delay(2000); //Safety delay
+
 }//End Setup Loop
 
 // ------------------------VOID LOOP------------------------------- //
