@@ -21,11 +21,19 @@ unsigned long pastTime = 0; // Set pastTime to 0. Don't redefine this anywhere o
 //FastLED Variables
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-#define NUM_LEDS    7
-#define NUM_ARRAYS  4
 #define BRIGHTNESS  255
-uint8_t LED[NUM_ARRAYS][NUM_LEDS]; //preallocate LED arrays
-CRGB leds[NUM_LEDS*NUM_ARRAYS];
+#define NUM_LEDS    7                   //Number of LEDs per tally lamp
+#define NUM_SETS    4                   //Total number of tally lamps
+#define TOTAL_LEDS  NUM_LEDS*NUM_SETS   //Total number of LEDs
+
+//FastLED Data Structure Setup
+CRGB rawleds[TOTAL_LEDS];
+CRGBSet leds(rawleds, TOTAL_LEDS);    //Use this if you want to do things with all LEDs
+CRGBSet set1(leds(NUM_LEDS*0,NUM_LEDS*1-1));
+CRGBSet set2(leds(NUM_LEDS*1,NUM_LEDS*2-1));
+CRGBSet set3(leds(NUM_LEDS*2,NUM_LEDS*3-1));
+CRGBSet set4(leds(NUM_LEDS*3,NUM_LEDS*4-1));
+struct CRGB * ledarray[] ={set1, set2, set3, set4}; 
 
 //OBS Variables
 int SerialInt = 0;  // Global array for Serial integer. Initialize at 0.
@@ -39,18 +47,9 @@ int lastPreview;
 
 // ------------------------SETUP LOOP------------------------------- //
 void setup() {
-
-  // Prints LED array for debugging
-  for( int j=0; j<NUM_ARRAYS; j++){
-  for( int i=0; i<NUM_LEDS; i++) {Serial.print(LED[j][i]);}
-  Serial.println();
-  }
-
-  // Build LED variable
-  for( int i=0; i<NUM_LEDS; i++) { LED[NUM_ARRAYS][i] = i; }
-  
-  // tell FastLED about the LED strip configuration
-  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS)
+ 
+  // tell FastLED about the LED array configuration.
+  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, TOTAL_LEDS)
     .setCorrection(TypicalLEDStrip)
     .setDither(BRIGHTNESS < 255);
 
@@ -75,7 +74,7 @@ void loop(void) {
   if(Serial.available()) { // Check if recieving data
     
     //ReadSerial(); // Record serial bits using custom function.
-    SerialInt = Serial.parseInt();
+    SerialInt = Serial.parseInt() - 1;
       
     // Live Range //
     if ((SerialInt>=1) && (SerialInt<=5)){ //If within live range
@@ -87,7 +86,7 @@ void loop(void) {
       currentPreview = SerialInt-5; // Update preview state
     }
   }else { //If not recieving any data
-    for( int i = 0; i < NUM_LEDS; i++) { leds[i] = CRGB::Gray; }
+    fill_solid( leds, TOTAL_LEDS, CRGB::Gray ); //Fill all LEDs gray
     FastLED.show();
   }//End Serial.available()
 
@@ -96,11 +95,11 @@ void loop(void) {
   // Preview //
   if(currentPreview != lastPreview && currentPreview != currentLive) { //If preview state changes & not currently live
       FastLED.clear(); // Clear all pixel data
-      if (currentPreview == 1) {
+      //if (currentPreview == 1) {
         //FastLED.clear(); // Clear all pixel data
-        for( int i = 0 ; i < NUM_LEDS; i++) { leds[i] = CRGB::Green; }
+        fill_solid( ledarray[currentPreview], NUM_LEDS, CRGB::Green );
         //Serial.print("Current preview:" ); Serial.println(currentPreview);
-      }
+      //}
     }else{
       FastLED.clear(); // Clear all pixel data
     lastPreview = currentPreview; //Update preview state
@@ -109,11 +108,11 @@ void loop(void) {
   // Live //
   //if(currentLive != lastLive) { //If live state changes
     //FastLED.clear(); // Clear all pixel data
-      if (currentLive == 1) {
+      //if (currentLive == 1) {
         //FastLED.clear(); // Clear all pixel data
-        for( int i = 0 ; i < NUM_LEDS; i++) { leds[i] = CRGB::Red; }
+        fill_solid( ledarray[currentLive], NUM_LEDS, CRGB::Red );
         //Serial.print("Current scene:" ); Serial.println(currentLive);
-      }
+      //}
     lastLive = currentLive; //Update live state
   //}
   
