@@ -28,7 +28,7 @@ unsigned long pastTime = 0; // Set pastTime to 0. Don't redefine this anywhere o
 
 //FastLED Data Structure Setup
 CRGB rawleds[TOTAL_LEDS];
-CRGBSet leds(rawleds, TOTAL_LEDS);    //Use this if you want to do things with all LEDs
+CRGBSet leds(rawleds, TOTAL_LEDS);    //Use this if you want to do things with all LEDs at once
 CRGBSet set1(leds(NUM_LEDS*0,NUM_LEDS*1-1));
 CRGBSet set2(leds(NUM_LEDS*1,NUM_LEDS*2-1));
 CRGBSet set3(leds(NUM_LEDS*2,NUM_LEDS*3-1));
@@ -36,7 +36,7 @@ CRGBSet set4(leds(NUM_LEDS*3,NUM_LEDS*4-1));
 struct CRGB * ledarray[] ={set1, set2, set3, set4}; 
 
 //OBS Variables
-int SerialInt = 0;  // Global array for Serial integer. Initialize at 0.
+int SerialInt;  // Global array for Serial integer.
 int currentLive;
 int lastLive;
 int currentPreview;
@@ -85,35 +85,31 @@ void loop(void) {
     
     // Preview Range //
     if ((SerialInt>=5) && (SerialInt<=9)){ //If within preview range
-      currentPreview = SerialInt-4; // Update preview state
+      currentPreview = SerialInt - 5; // Update preview state & subtract 5 so it matches live range
     }
+
+    ////////////// Tally Light States ///////////////
+    // Preview //
+    if(currentPreview != lastPreview) { //If preview state changes & not currently live
+        fill_solid( ledarray[lastPreview], NUM_LEDS, CRGB::Black ); // Clear pixel data if state changes
+        lastPreview = currentPreview; //Update preview state
+    }else{
+        fill_solid( ledarray[currentPreview], NUM_LEDS, CRGB::Green );
+    }
+  
+    // Live //
+    if(currentLive != lastLive) { //If live state changes
+      fill_solid( ledarray[lastLive], NUM_LEDS, CRGB::Black ); // Clear pixel data if state changes
+      lastLive = currentLive; //Update live state
+    }else{
+      fill_solid( ledarray[currentLive], NUM_LEDS, CRGB::Red );
+    }
+
   }else { //If not recieving any data
     fill_solid( leds, TOTAL_LEDS, CRGB::Gray ); //Fill all LEDs gray
-    FastLED.show();
   }//End Serial.available()
 
-
-  ////////////// Tally Light States ///////////////
-  // Preview //
-  if(currentPreview != lastPreview && currentPreview != currentLive) { //If preview state changes & not currently live
-      FastLED.clear(); // Clear all pixel data
-      lastPreview = currentPreview; //Update preview state
-  }else{
-      fill_solid( ledarray[currentPreview], NUM_LEDS, CRGB::Green );
-      FastLED.show(); //Update all LED states
-      //Serial.print("Current preview:" ); Serial.println(currentPreview);
-  }
-
-  // Live //
-  if(currentLive != lastLive) { //If live state changes
-    FastLED.clear(); // Clear all pixel data
-    lastLive = currentLive; //Update live state
-  }else{
-    fill_solid( ledarray[currentLive], NUM_LEDS, CRGB::Red );
-    FastLED.show(); //Update all LED states
-  }
-
-  //FastLED.show(); //Update all LED states
+  FastLED.show(); //Update all LED states
   //delay(10); //Simple debounce delay
   
 }//End Void Loop
