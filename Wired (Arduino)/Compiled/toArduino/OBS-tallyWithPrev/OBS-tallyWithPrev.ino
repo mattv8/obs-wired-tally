@@ -90,20 +90,20 @@ void loop(void) {
 
     ////////////// Tally Light States ///////////////
     // Preview //
-    if(currentPreview != lastPreview) { //If preview state changes & not currently live
+    if(currentPreview != lastPreview) { //If preview state changes
         fill_solid( ledarray[lastPreview], NUM_LEDS, CRGB::Black ); // Clear pixel data if state changes
         lastPreview = currentPreview; //Update preview state
-    }else{
-        fill_solid( ledarray[currentPreview], NUM_LEDS, CRGB::Green );
     }
+    fill_solid( ledarray[currentPreview], NUM_LEDS, CRGB::Green );
+    
   
     // Live //
     if(currentLive != lastLive) { //If live state changes
       fill_solid( ledarray[lastLive], NUM_LEDS, CRGB::Black ); // Clear pixel data if state changes
       lastLive = currentLive; //Update live state
-    }else{
-      fill_solid( ledarray[currentLive], NUM_LEDS, CRGB::Red );
     }
+    fill_solid( ledarray[currentLive], NUM_LEDS, CRGB::Red );
+    
 
   }else { //If not recieving any data
     fill_solid( leds, TOTAL_LEDS, CRGB::Gray ); //Fill all LEDs gray
