@@ -89,27 +89,28 @@ void loop(void) {
     }
 
     ////////////// Tally Light States ///////////////
-    // Preview //
+    // Preview State //
     if(currentPreview != lastPreview) { //If preview state changes
         fill_solid( ledarray[lastPreview], NUM_LEDS, CRGB::Black ); // Clear pixel data if state changes
         lastPreview = currentPreview; //Update preview state
     }
-    fill_solid( ledarray[currentPreview], NUM_LEDS, CRGB::Green );
     
-  
-    // Live //
+    // Live State //
     if(currentLive != lastLive) { //If live state changes
       fill_solid( ledarray[lastLive], NUM_LEDS, CRGB::Black ); // Clear pixel data if state changes
       lastLive = currentLive; //Update live state
     }
+
+    // Update LED Color States //
+    // NOTE: Order is important here. Live is last so it "wins out" over Preview color.
+    fill_solid( ledarray[currentPreview], NUM_LEDS, CRGB::Green );
     fill_solid( ledarray[currentLive], NUM_LEDS, CRGB::Red );
-    
 
   }else { //If not recieving any data
     fill_solid( leds, TOTAL_LEDS, CRGB::Gray ); //Fill all LEDs gray
   }//End Serial.available()
 
-  FastLED.show(); //Update all LED states
+  FastLED.show(); //Send LED color states to the LEDs
   //delay(10); //Simple debounce delay
   
 }//End Void Loop
