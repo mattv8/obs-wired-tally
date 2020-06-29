@@ -76,16 +76,16 @@ void loop(void) {
   if(Serial.available()) { // Check if recieving data
     
     //ReadSerial(); // Record serial bits using custom function.
-    SerialInt = Serial.parseInt() - 1;
+    SerialInt = Serial.parseInt();
       
     // Live Range //
-    if ((SerialInt>=1) && (SerialInt<=5)){ //If within live range
+    if ((SerialInt>=0) && (SerialInt<=4)){ //If within live range
       currentLive = SerialInt; // Update live state
     }
     
     // Preview Range //
-    if ((SerialInt>=6) && (SerialInt<=10)){ //If within preview range
-      currentPreview = SerialInt-5; // Update preview state
+    if ((SerialInt>=5) && (SerialInt<=9)){ //If within preview range
+      currentPreview = SerialInt-4; // Update preview state
     }
   }else { //If not recieving any data
     fill_solid( leds, TOTAL_LEDS, CRGB::Gray ); //Fill all LEDs gray
@@ -97,28 +97,23 @@ void loop(void) {
   // Preview //
   if(currentPreview != lastPreview && currentPreview != currentLive) { //If preview state changes & not currently live
       FastLED.clear(); // Clear all pixel data
-      //if (currentPreview == 1) {
-        //FastLED.clear(); // Clear all pixel data
-        fill_solid( ledarray[currentPreview], NUM_LEDS, CRGB::Green );
-        //Serial.print("Current preview:" ); Serial.println(currentPreview);
-      //}
-    }else{
-      FastLED.clear(); // Clear all pixel data
-    lastPreview = currentPreview; //Update preview state
+      lastPreview = currentPreview; //Update preview state
+  }else{
+      fill_solid( ledarray[currentPreview], NUM_LEDS, CRGB::Green );
+      FastLED.show(); //Update all LED states
+      //Serial.print("Current preview:" ); Serial.println(currentPreview);
   }
 
   // Live //
-  //if(currentLive != lastLive) { //If live state changes
-    //FastLED.clear(); // Clear all pixel data
-      //if (currentLive == 1) {
-        //FastLED.clear(); // Clear all pixel data
-        fill_solid( ledarray[currentLive], NUM_LEDS, CRGB::Red );
-        //Serial.print("Current scene:" ); Serial.println(currentLive);
-      //}
+  if(currentLive != lastLive) { //If live state changes
+    FastLED.clear(); // Clear all pixel data
     lastLive = currentLive; //Update live state
-  //}
-  
-  FastLED.show(); //Update all LED states
+  }else{
+    fill_solid( ledarray[currentLive], NUM_LEDS, CRGB::Red );
+    FastLED.show(); //Update all LED states
+  }
+
+  //FastLED.show(); //Update all LED states
   //delay(10); //Simple debounce delay
   
 }//End Void Loop
