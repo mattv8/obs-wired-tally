@@ -100,7 +100,7 @@ namespace OBSTallyClient
                     {
                         oldLabel = newLabel;
                         newLabel = label1;
-                        serialPort1.Write("1\r\n");
+                        serialPort1.Write("0\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
@@ -108,7 +108,7 @@ namespace OBSTallyClient
                     {
                         oldLabel = newLabel;
                         newLabel = label2;
-                        serialPort1.Write("2\r\n");
+                        serialPort1.Write("1\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
@@ -116,7 +116,7 @@ namespace OBSTallyClient
                     {
                         oldLabel = newLabel;
                         newLabel = label3;
-                        serialPort1.Write("3\r\n");
+                        serialPort1.Write("2\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
@@ -124,7 +124,7 @@ namespace OBSTallyClient
                     {
                         oldLabel = newLabel;
                         newLabel = label4;
-                        serialPort1.Write("4\r\n");
+                        serialPort1.Write("3\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
@@ -132,7 +132,7 @@ namespace OBSTallyClient
                     {
                         oldLabel = newLabel;
                         newLabel = label5;
-                        serialPort1.Write("5\r\n");
+                        serialPort1.Write("4\r\n");
                         //label5.Text = "Bad scene name!";
                     }
 
@@ -142,7 +142,7 @@ namespace OBSTallyClient
                     {
                         oldPrevLabel = prevLabel;
                         prevLabel = label1;
-                        serialPort1.Write("6\r\n");
+                        serialPort1.Write("5\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
@@ -150,7 +150,7 @@ namespace OBSTallyClient
                     {
                         oldPrevLabel = prevLabel;
                         prevLabel = label2;
-                        serialPort1.Write("7\r\n");
+                        serialPort1.Write("6\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
@@ -158,7 +158,7 @@ namespace OBSTallyClient
                     {
                         oldPrevLabel = prevLabel;
                         prevLabel = label3;
-                        serialPort1.Write("8\r\n");
+                        serialPort1.Write("7\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
@@ -166,7 +166,7 @@ namespace OBSTallyClient
                     {
                         oldPrevLabel = prevLabel;
                         prevLabel = label4;
-                        serialPort1.Write("9\r\n");
+                        serialPort1.Write("8\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
@@ -174,7 +174,7 @@ namespace OBSTallyClient
                     {
                         oldPrevLabel = prevLabel;
                         prevLabel = label5;
-                        serialPort1.Write("10\r\n");
+                        serialPort1.Write("9\r\n");
                         //label5.Text = "Bad preview name!";
                     }
 
