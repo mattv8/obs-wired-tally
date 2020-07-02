@@ -21,7 +21,7 @@ unsigned long pastTime = 0; // Set pastTime to 0. Don't redefine this anywhere o
 //FastLED Variables
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-#define BRIGHTNESS  255
+#define DUTY_CYCLE  255                 //PWM duty cycle initialization
 #define NUM_LEDS    7                   //Number of LEDs per tally lamp
 #define NUM_SETS    4                   //Total number of tally lamps
 #define TOTAL_LEDS  NUM_LEDS*NUM_SETS   //Total number of LEDs
@@ -36,11 +36,13 @@ CRGBSet set4(leds(NUM_LEDS*3,NUM_LEDS*4-1));
 struct CRGB * ledarray[] ={set1, set2, set3, set4}; 
 
 //OBS Variables
-int SerialInt;  // Global array for Serial integer.
+int SerialInt;   // Global array for Serial integer.
 int currentLive;
 int lastLive;
 int currentPreview;
 int lastPreview;
+int SerialState = 0;
+int lastSerialState = 0;
 
 // ------------------------FUNCTIONS------------------------ //
 
@@ -48,13 +50,10 @@ int lastPreview;
 // ------------------------SETUP LOOP------------------------------- //
 void setup() {
  
-  // tell FastLED about the LED array configuration.
+  // Tell FastLED about the LED array configuration.
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, TOTAL_LEDS)
-    .setCorrection(TypicalLEDStrip)
-    .setDither(BRIGHTNESS < 255);
-
-  // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
+    .setCorrection(TypicalSMD5050)
+    .setDither(DUTY_CYCLE < 255);
   
   // Pin mode initializations //
   pinMode(Vout, OUTPUT);
@@ -72,8 +71,18 @@ void loop(void) {
   ////////////// Perpetually Updating ///////////////
   //currentTime = millis(); // Update the master clock
 
+  // Clear out all the LEDs upon serial state change
+  SerialState = Serial.available();
+  if (SerialState != lastSerialState) {
+    FastLED.clear();
+    //fill_solid( leds, TOTAL_LEDS, CRGB::Black ); //Fill all LEDs black
+  }
+  
   ////////////// Serial Communication ///////////////
   if(Serial.available()) { // Check if recieving data
+        
+    //Bump up duty cycle for only 2 lights
+    FastLED.setBrightness(DUTY_CYCLE*.1);//10% duty cycle
     
     //ReadSerial(); // Record serial bits using custom function.
     SerialInt = Serial.parseInt();
@@ -87,7 +96,7 @@ void loop(void) {
     if ((SerialInt>=5) && (SerialInt<=9)){ //If within preview range
       currentPreview = SerialInt - 5; // Update preview state & subtract 5 so it matches live range
     }
-
+    
     ////////////// Tally Light States ///////////////
     // Preview State //
     if(currentPreview != lastPreview) { //If preview state changes
@@ -107,9 +116,13 @@ void loop(void) {
     fill_solid( ledarray[currentLive], NUM_LEDS, CRGB::Red );
 
   }else { //If not recieving any data
-    fill_solid( leds, TOTAL_LEDS, CRGB::Gray ); //Fill all LEDs gray
+    
+    FastLED.setBrightness(DUTY_CYCLE*.02);//2% duty cycle for all lights at once
+    fill_solid( leds, TOTAL_LEDS, CRGB::White ); //Fill all LEDs gray
+    
   }//End Serial.available()
 
+  lastSerialState = SerialState; //Update serial state
   FastLED.show(); //Send LED color states to the LEDs
   //delay(10); //Simple debounce delay
   
