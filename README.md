@@ -10,7 +10,7 @@ Requirments to Build the Project
 ----------------------------
 1. A computer with [OBS](https://obsproject.com/download) and the [OBS Websockets Plugin](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466/) installed.
 2. Access to a 3D printer.
-	a. Recommended: [Solutech White filament](https://www.amazon.com/gp/product/B01B5KFRHO/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) for best LED color results.
+	- Recommended: [Solutech White filament](https://www.amazon.com/gp/product/B01B5KFRHO/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) for best LED color results.
 3. An [Arduino Pro Micro](https://www.amazon.com/OSOYOO-ATmega32U4-arduino-Leonardo-ATmega328/dp/B012FOV17O?th=1).
 4. [WS2812B Ring Lamp](https://www.amazon.com/gp/product/B0105VMT4S/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) or similar 23mm diameter.
 5. [3.5 mm surface-mount headphone connector](https://www.amazon.com/dp/B0833WYLWQ/ref=dp_cerb_1).
@@ -21,7 +21,7 @@ Requirments to Contribute to the Project
 ----------------------------
 If you want to contribute to the software side:
 1. Microsoft Visual Studio 2019
-	a. This project utilizes the [Costura.Fody](https://www.nuget.org/packages/Costura.Fody/) packager, which can be installed with NuGet.
+	- This project utilizes the [Costura.Fody](https://www.nuget.org/packages/Costura.Fody/) packager, which can be installed with NuGet.
 2. Arduino IDE
 
 If you want to contribute to the hardware side:
