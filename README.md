@@ -4,7 +4,10 @@ OBS Wired Tally Project
 Project Overview
 ----------------------------
 This project utilizes a Windows .NET app, OBS websocket plugin, Arduino Pro Micro, WS2812 RGB LEDs, and 3D printed hardware.
-![Video Demonstration](https://visn.ky/3dtop)
+
+<figure class="video_container">
+  <iframe src="https://visn.ky/3dtop" frameborder="0" allowfullscreen="true"> </iframe>
+</figure>
 
 Requirments to Build the Project
 ----------------------------
