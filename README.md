@@ -25,7 +25,8 @@ If you want to contribute to the software side:
 2. Arduino IDE
 
 If you want to contribute to the hardware side:
-3. PTC Creo 5
+1. PTC Creo 5 for editing CAD files.
+	- Other programs like Solidworks will work, but you will be working with STEP files which won't have model tree data.
 
 Credits
 -----------------------------
