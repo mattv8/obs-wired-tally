@@ -14,8 +14,10 @@ Requirments to Build the Project
 3. An [Arduino Pro Micro](https://www.amazon.com/OSOYOO-ATmega32U4-arduino-Leonardo-ATmega328/dp/B012FOV17O?th=1).
 4. [WS2812B Ring Lamp](https://www.amazon.com/gp/product/B0105VMT4S/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) or similar 23mm diameter.
 5. [3.5 mm surface-mount headphone connector](https://www.amazon.com/dp/B0833WYLWQ/ref=dp_cerb_1).
-6. Soldering iron and solder.
-7. [28 AWG copper wire (recommended)](https://www.amazon.com/Electrical-different-Insulated-Temperature-Resistance/dp/B07G2HFCS1/ref=sr_1_5?dchild=1&keywords=28+gauge+wire&qid=1598292006&sr=8-5).
+6. [3.5 mm male-to-male headphone wire](https://www.amazon.com/gp/product/B004JWIPKM/ref=ppx_yo_dt_b_asin_title_o00_s01?ie=UTF8&psc=1). 
+	-I recommend getting it in 25 ft length, or as necessary for the distance between your cameras.
+7. Soldering iron and solder.
+8. [28 AWG copper wire (recommended)](https://www.amazon.com/Electrical-different-Insulated-Temperature-Resistance/dp/B07G2HFCS1/ref=sr_1_5?dchild=1&keywords=28+gauge+wire&qid=1598292006&sr=8-5).
 
 Requirments to Contribute to the Project
 ----------------------------
