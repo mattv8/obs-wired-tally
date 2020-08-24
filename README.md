@@ -1,8 +1,19 @@
 OBS Wired and Wireless Tally Project
 ==================================================
 
+Wired Tally -- Installed on Arduino Pro Micro -- Arduino Directory
+----------------------------
+
+Software uese Windows app, OBS websocket and Arduino Pro Micro.
+
+TO DO: add demo video of the project in use.
+
+Source code can be found in Arduino/Source. .NET can be developed in Visual Studio.
+
+
 Wireless Tally -- Installed on Raspberry Pi -- RPi Directory
 ----------------------------
+NOTE: THIS IS A WORK IN PROGRESS.
 
 This project is to make a Raspberry pi into a wireless OBS tally light.
 This is tested on a Raspberry Pi Zero W running Raspbian (non-desktop).
@@ -73,28 +84,6 @@ Next project steps:
 - publish a complete configured image for Raspberry pi 3B+
 
 It would be nice to develop an intercom system with a USB headset and the Pi.
-
-Wired Tally -- Installed on Arduino Pro Micro -- Arduino Directory
-----------------------------
-
-Software uese Windows app, OBS websocket and Arduino Pro Micro
-
-Note: This is a .NET app and only runs on Windows
-
-How to install
-1. Wire up the LEDs to your Arduino
-2. Scene 1 is PIN 12, Scene 2 is pin 11, 3 is 10, 4 is 9 (pin 8 is for "out of range")
-3. For preview use PINs 7, 6, 5, 4 (and pin 3 is for preview "out of range")
-
-4. Content from folder "toArduino" should be compiled and uploaded onto your Arduino.
-5. If not done before, install obs-websocket plugin to OBS.
-6. Run the app in "toOBSComputer" folder.
-7. Go through setup (enter names of your scenes and websocket password) IMPORTANT NOTE: the app won't work without password in websocket.
-8. Select COM port your Arduino is connected to.
-
-test: driverino
-
-Source code can be found in Arduino/Source. .NET can be developed in Visual Studio.
 
 Credits
 -----------------------------
