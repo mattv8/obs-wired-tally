@@ -4,7 +4,7 @@ OBS Wired Tally Project
 Project Overview
 ----------------------------
 This project utilizes a Windows .NET app, OBS websocket plugin, Arduino Pro Micro, WS2812 RGB LEDs, and 3D printed hardware.
-![Video Demonstration](https://photos.app.goo.gl/BGXYbXnqVwfapmd9A)
+![Video Demonstration](https://lh3.googleusercontent.com/TgmlgsOSjczMnvJGlJucSVHJevzyrfq4QHi5qjzdWSjEujpfwn5Tb12xS8T15CuHMZM76mWys75T8_zIbx-tj-TvCepFkVZ9l_BxP30M8jI6u6qnrC2z3KH64yJMZtSXN-YlQHY_sKS5X7dswv2Ns0it5IYV_RjbChrA3KkWzjsp0p63jkipBbIqKiALoR4C1BbAEr_meXuSz4lTivqlkbQw2XYy5VSb3nWmouK_qHOq0ae_-s6ulxqPLuKjFa1WcOlw3-mnYGzA6eVTkUOAVJ09RfaDaEpx7GyJAJNAOjSwGebojISeHr5gttqHzHT0flfoZkVVli4bVxmzljVmFO_OBeoTiScMbPtq36acsYGuYbnPs9SJNzqIK0qnffgUmm4VyFfpFSHm5kXuUfTjMglfz7qeooW0oQgRQAEX9IcVftXaqqrwk4AVZEtgch_natPZ9gnpX88nLoEcgprPuvcvEePzslfvyrQychP1cqjAxSHlyl0U1m8QPGRM8nXtuAVGUH4QQaE-5zQ_xCT1MZ7fXoa1uJTmHJvF_jzpeUn7r_mwtgLf-2-qGOiErJTUgFS-tYHD_p6WBw6r24sKtcHrUrUSRHrT_m4qhbCzW9LGzGLOQobrshMCf6YzvGi5PXxWr9tTTaaXMYxSNaagB1PCYGmcHRzRJo398LLLj1iPBV2lrnoGh3JuG44VwBn5S24Ks0pXL2ixGnBdLU4mGAz8-aw421Tx8jTAYuqgICnJnI-j4F1-55zr=m18?cpn=gccWQLD6pcQCgjxS&c=WEB_EMBEDDED_PLAYER&cver=20200821)
 
 Requirments to Build the Project
 ----------------------------
