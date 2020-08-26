@@ -5,7 +5,7 @@ Project Overview
 ----------------------------
 This project utilizes a Windows .NET app, OBS websocket plugin, Arduino Pro Micro, WS2812 RGB LEDs, and 3D printed hardware.
 
-![Video Demonstration](https://visn.ky/3dtop)
+[Video Demonstration](/OBS-Tally-Demo_lores.mp4)
 
 Requirments to Build the Project
 ----------------------------
