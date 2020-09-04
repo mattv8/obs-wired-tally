@@ -30,9 +30,9 @@ I would welcome any software contributions! I have licensed the CAD parts and so
 
 If you want to contribute to the hardware side:
 1. PTC Creo 5 for editing CAD files.
-	-Unfortunately Creo is not free software. 😢 FOSS alternatives are [FreeCAD](https://www.freecadweb.org/), [OpenSCAD](https://www.openscad.org/) or [Blender](https://www.blender.org/download/).
-	-I have provided STEP files in the "/CAD/STEP Files" folder that can be opened in other CAD programs.
-	-I have provided STL files in the "/CAD/STL Files" that can be sent straight to your favorite slicer for 3D printing.
+	- Unfortunately Creo is not free software. FOSS alternatives are [FreeCAD](https://www.freecadweb.org/), [OpenSCAD](https://www.openscad.org/) or [Blender](https://www.blender.org/download/).
+	- I have provided STEP files in the "/CAD/STEP Files" folder that can be opened in other CAD programs.
+	- I have provided STL files in the "/CAD/STL Files" that can be sent straight to your favorite slicer for 3D printing.
 
 Credits
 -----------------------------
