@@ -1,11 +1,14 @@
-﻿using OBSWebsocketDotNet;
+﻿
 using System;
-using System.Drawing;
 using System.Windows.Forms;
+using OBSWebsocketDotNet;
+using OBSWebsocketDotNet.Types;
+using System.Drawing;
 using System.Xml;
 
 namespace OBSTallyClient
 {
+    
     public partial class MainProgram : Form
     {
         OBSWebsocket mainWebsocket = new OBSWebsocket();
@@ -89,12 +92,23 @@ namespace OBSTallyClient
             {
                 try
                 {
-                    //serialPort1.Open();
+                    // Get current and preview scene names
                     string currentScene = mainWebsocket.GetCurrentScene().Name;
                     string previewScene = mainWebsocket.GetPreviewScene().Name;
-                    //serialPort1.WriteLine(currentScene);
 
+                    // List all sources in active scene
+                    var currentSceneSources = mainWebsocket.GetCurrentScene().Items;
+                    foreach (var item in currentSceneSources)
+                    {
+                        //Console.WriteLine(item.SourceName);
+                    }
 
+                    // List all sources in preview scene
+                    var previewSceneSources = mainWebsocket.GetPreviewScene().Items;
+                    foreach (var item in previewSceneSources)
+                    {
+                        //Console.WriteLine(item.SourceName);
+                    }
 
                     if (currentScene == source1)
                     {
@@ -235,5 +249,26 @@ namespace OBSTallyClient
         {
 
         }
+
+        private void MainProgram_Resize(object sender, EventArgs e)
+        {
+
+            if (FormWindowState.Minimized == this.WindowState)
+            {
+                notifyIcon1.Visible = true;
+                this.Hide();
+            }
+            else if (FormWindowState.Normal == this.WindowState)
+            {
+                notifyIcon1.Visible = false;
+            }
+        }
+
+        private void notifyIcon1_Click(object sender, MouseEventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+        }
+
     }
 }
