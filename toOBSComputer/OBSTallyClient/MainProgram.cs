@@ -107,7 +107,7 @@ namespace OBSTallyClient
                     var previewSceneSources = mainWebsocket.GetPreviewScene().Items;
                     foreach (var item in previewSceneSources)
                     {
-                        //Console.WriteLine(item.SourceName);
+                        Console.WriteLine(item.SourceName);
                     }
 
                     if (currentScene == source1)
