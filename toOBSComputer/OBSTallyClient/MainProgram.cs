@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.IO;
 using System.Windows.Forms;
 using OBSWebsocketDotNet;
 using OBSWebsocketDotNet.Types;
@@ -22,9 +23,9 @@ namespace OBSTallyClient
 
 
         public Label newLabel;
-        public Label prevLabel;
+        public Label PreviewLabel;
         public Label oldLabel;
-        public Label oldPrevLabel;
+        public Label oldPreviewLabel;
 
         public MainProgram()
         {
@@ -34,42 +35,30 @@ namespace OBSTallyClient
         private void Form1_Load(object sender, EventArgs e)
         {
 
-            newLabel = label5;
-            prevLabel = label5;
+            // Initialize labels
+            newLabel = label5; //debug label
+            PreviewLabel = label5; //debug label
 
             try
             {
                 XmlDocument xmlDoc = new XmlDocument();
 
-                xmlDoc.Load(Application.StartupPath + "\\config.xml");
-
-                XmlNode comSetup = xmlDoc.SelectSingleNode("root/Setup");
-                if (comSetup.Attributes["state"].Value != "completed")
+                bool config_file_exists = File.Exists("\\config.xml");
+                if (config_file_exists)
                 {
-                    //xmlDoc.Save(Application.StartupPath + "\\config.xml");
+                    xmlDoc.Load(Application.StartupPath + "\\config.xml");
+                }
+                /*else
+                {
+                    //Console.WriteLine("Config file doesn't exist.");
                     setupPopup setItUp = new setupPopup();
                     setItUp.ShowDialog();
-                }
-
-                XmlNode first = xmlDoc.SelectSingleNode("root/Source1");
-                source1 = first.Attributes["name"].Value;
-
-                XmlNode second = xmlDoc.SelectSingleNode("root/Source2");
-                source2 = second.Attributes["name"].Value;
-
-                XmlNode third = xmlDoc.SelectSingleNode("root/Source3");
-                source3 = third.Attributes["name"].Value;
-
-                XmlNode fourth = xmlDoc.SelectSingleNode("root/Source4");
-                source4 = fourth.Attributes["name"].Value;
-
-                XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
-                wsPassword = wesPass.Attributes["password"].Value;
-
+                }*/
+            
             }
             catch
             {
-                MessageBox.Show("Unable to load configuration file!", "FAILED TO LOAD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Unable to load configuration file. Please run the setup.", "FAILED TO LOAD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             try
@@ -101,100 +90,60 @@ namespace OBSTallyClient
                     foreach (var item in currentSceneSources)
                     {
                         //Console.WriteLine(item.SourceName);
+
                     }
 
                     // List all sources in preview scene
                     var previewSceneSources = mainWebsocket.GetPreviewScene().Items;
                     foreach (var item in previewSceneSources)
                     {
-                        Console.WriteLine(item.SourceName);
+                        //Console.WriteLine(item.SourceName);
+
                     }
-
-                    if (currentScene == source1)
-                    {
-                        oldLabel = newLabel;
-                        newLabel = label1;
-                        serialPort1.Write("0\r\n");
-                        label5.Text = serialPort1.PortName;
-                    }
-
-                    else if (currentScene == source2)
-                    {
-                        oldLabel = newLabel;
-                        newLabel = label2;
-                        serialPort1.Write("1\r\n");
-                        label5.Text = serialPort1.PortName;
-                    }
-
-                    else if (currentScene == source3)
-                    {
-                        oldLabel = newLabel;
-                        newLabel = label3;
-                        serialPort1.Write("2\r\n");
-                        label5.Text = serialPort1.PortName;
-                    }
-
-                    else if (currentScene == source4)
-                    {
-                        oldLabel = newLabel;
-                        newLabel = label4;
-                        serialPort1.Write("3\r\n");
-                        label5.Text = serialPort1.PortName;
-                    }
-
-                    else
-                    {
-                        oldLabel = newLabel;
-                        newLabel = label5;
-                        serialPort1.Write("4\r\n");
-                        //label5.Text = "Bad scene name!";
-                    }
-
-
 
                     if (previewScene == source1)
                     {
-                        oldPrevLabel = prevLabel;
-                        prevLabel = label1;
+                        oldPreviewLabel = PreviewLabel;
+                        PreviewLabel = label1;
                         serialPort1.Write("5\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
                     else if (previewScene == source2)
                     {
-                        oldPrevLabel = prevLabel;
-                        prevLabel = label2;
+                        oldPreviewLabel = PreviewLabel;
+                        PreviewLabel = label2;
                         serialPort1.Write("6\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
                     else if (previewScene == source3)
                     {
-                        oldPrevLabel = prevLabel;
-                        prevLabel = label3;
+                        oldPreviewLabel = PreviewLabel;
+                        PreviewLabel = label3;
                         serialPort1.Write("7\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
                     else if (previewScene == source4)
                     {
-                        oldPrevLabel = prevLabel;
-                        prevLabel = label4;
+                        oldPreviewLabel = PreviewLabel;
+                        PreviewLabel = label4;
                         serialPort1.Write("8\r\n");
                         label5.Text = serialPort1.PortName;
                     }
 
                     else
                     {
-                        oldPrevLabel = prevLabel;
-                        prevLabel = label5;
+                        oldPreviewLabel = PreviewLabel;
+                        PreviewLabel = label5;
                         serialPort1.Write("9\r\n");
                         //label5.Text = "Bad preview name!";
                     }
 
-                    oldPrevLabel.BackColor = Color.Gray;
+                    oldPreviewLabel.BackColor = Color.Gray;
                     oldLabel.BackColor = Color.Gray;
-                    prevLabel.BackColor = Color.Green;
+                    PreviewLabel.BackColor = Color.Green;
                     newLabel.BackColor = Color.Red;
 
                 }

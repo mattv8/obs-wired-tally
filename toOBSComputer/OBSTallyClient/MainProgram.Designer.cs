@@ -128,7 +128,6 @@ namespace OBSTallyClient
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "MainProgram";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Resize += new System.EventHandler(this.MainProgram_Resize);
             this.ResumeLayout(false);

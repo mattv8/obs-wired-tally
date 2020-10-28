@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -15,7 +16,11 @@ namespace OBSTallyClient
         {
             XmlDocument xmlDoc = new XmlDocument();
 
-            xmlDoc.Load(Application.StartupPath + "\\config.xml");
+            bool config_file_exists = File.Exists("\\config.xml");
+            if (config_file_exists)
+            {
+                xmlDoc.Load(Application.StartupPath + "\\config.xml");
+            }
 
             XmlNode source1 = xmlDoc.SelectSingleNode("root/Source1");
             source1.Attributes["name"].Value = textBox1.Text;
@@ -41,7 +46,7 @@ namespace OBSTallyClient
             }
             catch
             {
-                MessageBox.Show("Unable to save!", "Failed to write file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Unable to save config file.", "Failed to write file", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             this.Close();
