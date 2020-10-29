@@ -3,10 +3,10 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 using OBSWebsocketDotNet;
-using OBSWebsocketDotNet.Types;
+//using OBSWebsocketDotNet.Types;
 using System.Drawing;
 using System.Xml;
-
+//using System.Threading;
 
 namespace OBSTallyClient
 {
@@ -21,6 +21,8 @@ namespace OBSTallyClient
         public string source4;
         public string wsPassword;
 
+        public string currentScene;
+        public string previewScene;
         public bool exitFlag = false;
 
         public Label newLabel;
@@ -42,23 +44,18 @@ namespace OBSTallyClient
 
             try
             {
-                xmlDoc.Load(Application.StartupPath + "\\config.xml");
-                XmlNode first = xmlDoc.SelectSingleNode("root/Source1");
-                source1 = first.Attributes["name"].Value;
-                XmlNode second = xmlDoc.SelectSingleNode("root/Source2");
-                source2 = second.Attributes["name"].Value;
-                XmlNode third = xmlDoc.SelectSingleNode("root/Source3");
-                source3 = third.Attributes["name"].Value;
-                XmlNode fourth = xmlDoc.SelectSingleNode("root/Source4");
-                source4 = fourth.Attributes["name"].Value;
-                XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
-                wsPassword = wesPass.Attributes["password"].Value;
-
+                loadXML(); // Load the XML file, catch if it doesn't exist
+                exitFlag = true;
             }
-            catch (FileNotFoundException ex1)
+            catch (FileNotFoundException ex1) //if Config doesn't exist, show setupPopup
             {
                 setupPopup setItUp = new setupPopup();
                 var setupResult = setItUp.ShowDialog();
+                if (setItUp.exitFlag == true)
+                {
+                    loadXML();
+                    exitFlag = true;
+                }
             }
             catch (Exception ex2)
             {
@@ -75,34 +72,55 @@ namespace OBSTallyClient
             }
             catch
             {
-                MessageBox.Show("Failed to connect with OBS. Try running the setup.","ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to connect with OBS. Try running the setup again.","ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        private void loadXML()
+        {
+            xmlDoc.Load(Application.StartupPath + "\\config.xml");
+            XmlNode first = xmlDoc.SelectSingleNode("root/Source1");
+            source1 = first.Attributes["name"].Value;
+            XmlNode second = xmlDoc.SelectSingleNode("root/Source2");
+            source2 = second.Attributes["name"].Value;
+            XmlNode third = xmlDoc.SelectSingleNode("root/Source3");
+            source3 = third.Attributes["name"].Value;
+            XmlNode fourth = xmlDoc.SelectSingleNode("root/Source4");
+            source4 = fourth.Attributes["name"].Value;
+            XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
+            wsPassword = wesPass.Attributes["password"].Value;
         }
 
         private void timer1_Tick(object sender, EventArgs e) // Loops continuously 100ms
         {
             try //try even if serial port is closed
             {
-                // Get current and preview scene names
-                string currentScene = mainWebsocket.GetCurrentScene().Name;
-                string previewScene = mainWebsocket.GetPreviewScene().Name;
-
-                // List all sources in active scene
-                var currentSceneSources = mainWebsocket.GetCurrentScene().Items;
-                foreach (var item in currentSceneSources)
+                // Prevent running of websockets if config file doesn't exist.
+                // Otherwise these values initialize as nulls.
+                if (exitFlag == true)
                 {
-                    //Console.WriteLine(item.SourceName);
+                    // Get current and preview scene names
+                    currentScene = mainWebsocket.GetCurrentScene().Name;
+                    previewScene = mainWebsocket.GetPreviewScene().Name;
+
+                    // List all sources in active scene
+                    var currentSceneSources = mainWebsocket.GetCurrentScene().Items;
+                    foreach (var item in currentSceneSources)
+                    {
+                        //Console.WriteLine(item.SourceName);
+
+                    }
+
+                    // List all sources in preview scene
+                    var previewSceneSources = mainWebsocket.GetPreviewScene().Items;
+                    foreach (var item in previewSceneSources)
+                    {
+                        //Console.WriteLine(item.SourceName);
+
+                    }
 
                 }
 
-                // List all sources in preview scene
-                var previewSceneSources = mainWebsocket.GetPreviewScene().Items;
-                foreach (var item in previewSceneSources)
-                {
-                    //Console.WriteLine(item.SourceName);
-
-                }
-                
                 //// ACTIVE SCENES ////
                 if (currentScene == source1)
                 {
@@ -181,6 +199,10 @@ namespace OBSTallyClient
                 oldLabel.BackColor = Color.Gray;
                 prevLabel.BackColor = Color.Green;
                 newLabel.BackColor = Color.Red;
+            }
+            catch (System.InvalidOperationException)
+            {
+                Console.WriteLine("No serial connection established.");
             }
             catch
             {

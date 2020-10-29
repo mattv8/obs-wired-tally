@@ -7,10 +7,10 @@ namespace OBSTallyClient
 {
     public partial class setupPopup : Form
     {
+        public bool exitFlag = false;
         public setupPopup()
         {
             InitializeComponent();
-
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -18,32 +18,37 @@ namespace OBSTallyClient
             
             XmlDocument xmlDoc = new XmlDocument();
 
-            xmlDoc.Load(Application.StartupPath + "\\config.xml");
-            XmlNode source1 = xmlDoc.SelectSingleNode("root/Source1");
-            source1.Attributes["name"].Value = textBox1.Text;
+            XmlNode Root = xmlDoc.AppendChild(xmlDoc.CreateElement("root"));
 
-            XmlNode source2 = xmlDoc.SelectSingleNode("root/Source2");
-            source2.Attributes["name"].Value = textBox2.Text;
+            XmlNode Child1 = Root.AppendChild(xmlDoc.CreateElement("Websocket"));
+            XmlAttribute ChildAtt1 = Child1.Attributes.Append(xmlDoc.CreateAttribute("password"));
+            ChildAtt1.InnerText = textBox5.Text;
 
-            XmlNode source3 = xmlDoc.SelectSingleNode("root/Source3");
-            source3.Attributes["name"].Value = textBox3.Text;
+            XmlNode Child2 = Root.AppendChild(xmlDoc.CreateElement("Source1"));
+            XmlAttribute ChildAtt2 = Child2.Attributes.Append(xmlDoc.CreateAttribute("name"));
+            ChildAtt2.InnerText = textBox1.Text;
 
-            XmlNode source4 = xmlDoc.SelectSingleNode("root/Source4");
-            source4.Attributes["name"].Value = textBox4.Text;
+            XmlNode Child3 = Root.AppendChild(xmlDoc.CreateElement("Source2"));
+            XmlAttribute ChildAtt3 = Child3.Attributes.Append(xmlDoc.CreateAttribute("name"));
+            ChildAtt3.InnerText = textBox2.Text;
 
-            XmlNode websocket = xmlDoc.SelectSingleNode("root/Websocket");
-            websocket.Attributes["password"].Value = textBox5.Text;
+            XmlNode Child4 = Root.AppendChild(xmlDoc.CreateElement("Source3"));
+            XmlAttribute ChildAtt4 = Child4.Attributes.Append(xmlDoc.CreateAttribute("name"));
+            ChildAtt4.InnerText = textBox3.Text;
+
+            XmlNode Child5 = Root.AppendChild(xmlDoc.CreateElement("Source4"));
+            XmlAttribute ChildAtt5 = Child5.Attributes.Append(xmlDoc.CreateAttribute("name"));
+            ChildAtt5.InnerText = textBox4.Text;
 
             try
             {
                 xmlDoc.Save(Application.StartupPath + "\\config.xml");
-
+                this.exitFlag = true;
             }
             catch
             {
                 MessageBox.Show("Unable to save config file.", "Failed to write file", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            completeStatus();
             this.Close();
         }
 
@@ -51,12 +56,5 @@ namespace OBSTallyClient
         {
 
         }
-
-        private bool completeStatus()
-        {
-            bool exitFlag = true;
-            return exitFlag;
-        }
-
     }
 }

@@ -1,8 +1,0 @@
-<root>
-  <Setup state="completed" />
-  <Websocket password="tacos" />
-  <Source1 name="Cam 1" />
-  <Source2 name="Cam 2" />
-  <Source3 name="Cam 3" />
-  <Source4 name="Cam 4" />
-</root>
