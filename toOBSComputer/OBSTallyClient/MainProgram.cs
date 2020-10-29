@@ -7,12 +7,13 @@ using OBSWebsocketDotNet.Types;
 using System.Drawing;
 using System.Xml;
 
+
 namespace OBSTallyClient
 {
-    
     public partial class MainProgram : Form
     {
         OBSWebsocket mainWebsocket = new OBSWebsocket();
+        XmlDocument xmlDoc = new XmlDocument();
 
         public string source1;
         public string source2;
@@ -20,11 +21,13 @@ namespace OBSTallyClient
         public string source4;
         public string wsPassword;
 
+        public bool exitFlag = false;
+
         public Label newLabel;
         public Label prevLabel;
         public Label oldLabel;
         public Label oldprevLabel;
-
+        
         public MainProgram()
         {
             InitializeComponent();
@@ -39,17 +42,7 @@ namespace OBSTallyClient
 
             try
             {
-                XmlDocument xmlDoc = new XmlDocument();
-
                 xmlDoc.Load(Application.StartupPath + "\\config.xml");
-
-                XmlNode comSetup = xmlDoc.SelectSingleNode("root/Setup");
-                if (comSetup.Attributes["state"].Value != "completed")
-                {
-                    setupPopup setItUp = new setupPopup();
-                    setItUp.ShowDialog();
-                }
-
                 XmlNode first = xmlDoc.SelectSingleNode("root/Source1");
                 source1 = first.Attributes["name"].Value;
                 XmlNode second = xmlDoc.SelectSingleNode("root/Source2");
@@ -62,9 +55,14 @@ namespace OBSTallyClient
                 wsPassword = wesPass.Attributes["password"].Value;
 
             }
-            catch
+            catch (FileNotFoundException ex1)
             {
-                MessageBox.Show("Unable to load configuration file. Please run the setup.", "FAILED TO LOAD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                setupPopup setItUp = new setupPopup();
+                var setupResult = setItUp.ShowDialog();
+            }
+            catch (Exception ex2)
+            {
+                MessageBox.Show("An unspecified error occured.", "FAILED TO LOAD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             try
@@ -77,10 +75,10 @@ namespace OBSTallyClient
             }
             catch
             {
-                MessageBox.Show("Failed to connect with OBS");
+                MessageBox.Show("Failed to connect with OBS. Try running the setup.","ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-        
+
         private void timer1_Tick(object sender, EventArgs e) // Loops continuously 100ms
         {
             try //try even if serial port is closed
@@ -186,7 +184,7 @@ namespace OBSTallyClient
             }
             catch
             {
-                // Nothing here so it tries even if Arduino is disconnected
+
             }
         }
 

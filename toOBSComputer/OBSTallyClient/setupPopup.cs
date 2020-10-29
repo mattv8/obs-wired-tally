@@ -10,10 +10,12 @@ namespace OBSTallyClient
         public setupPopup()
         {
             InitializeComponent();
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            
             XmlDocument xmlDoc = new XmlDocument();
 
             xmlDoc.Load(Application.StartupPath + "\\config.xml");
@@ -29,21 +31,19 @@ namespace OBSTallyClient
             XmlNode source4 = xmlDoc.SelectSingleNode("root/Source4");
             source4.Attributes["name"].Value = textBox4.Text;
 
-            XmlNode comSetup = xmlDoc.SelectSingleNode("root/Setup");
-            comSetup.Attributes["state"].Value = "completed";
-
             XmlNode websocket = xmlDoc.SelectSingleNode("root/Websocket");
             websocket.Attributes["password"].Value = textBox5.Text;
 
             try
             {
                 xmlDoc.Save(Application.StartupPath + "\\config.xml");
+
             }
             catch
             {
                 MessageBox.Show("Unable to save config file.", "Failed to write file", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
+            completeStatus();
             this.Close();
         }
 
@@ -51,5 +51,12 @@ namespace OBSTallyClient
         {
 
         }
+
+        private bool completeStatus()
+        {
+            bool exitFlag = true;
+            return exitFlag;
+        }
+
     }
 }
