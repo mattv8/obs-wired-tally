@@ -16,12 +16,7 @@ namespace OBSTallyClient
         {
             XmlDocument xmlDoc = new XmlDocument();
 
-            bool config_file_exists = File.Exists("\\config.xml");
-            if (config_file_exists)
-            {
-                xmlDoc.Load(Application.StartupPath + "\\config.xml");
-            }
-
+            xmlDoc.Load(Application.StartupPath + "\\config.xml");
             XmlNode source1 = xmlDoc.SelectSingleNode("root/Source1");
             source1.Attributes["name"].Value = textBox1.Text;
 
