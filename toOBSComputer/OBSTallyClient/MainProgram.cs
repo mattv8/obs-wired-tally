@@ -64,15 +64,20 @@ namespace OBSTallyClient
 
             try
             {
+                //TO DO: set a websocket timeout: https://stackoverflow.com/questions/13546424/how-to-wait-for-a-websockets-readystate-to-change
                 mainWebsocket.Connect("ws://127.0.0.1:4444", wsPassword);
                 label1.BackColor = Color.Gray;
                 label2.BackColor = Color.Gray;
                 label3.BackColor = Color.Gray;
                 label4.BackColor = Color.Gray;
             }
+            catch (OBSWebsocketDotNet.AuthFailureException)
+            {
+                MessageBox.Show("Failed to connect with OBS: Websocket authentication has failed. Please run the setup again and verify the password is correct.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
             catch
             {
-                MessageBox.Show("Failed to connect with OBS. Try running the setup again.","ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to connect with OBS. Is OBS open?");
             }
         }
 
@@ -108,7 +113,6 @@ namespace OBSTallyClient
                     foreach (var item in currentSceneSources)
                     {
                         //Console.WriteLine(item.SourceName);
-
                     }
 
                     // List all sources in preview scene
@@ -116,7 +120,6 @@ namespace OBSTallyClient
                     foreach (var item in previewSceneSources)
                     {
                         //Console.WriteLine(item.SourceName);
-
                     }
 
                 }
