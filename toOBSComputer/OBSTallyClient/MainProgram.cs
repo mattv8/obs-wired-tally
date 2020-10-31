@@ -15,6 +15,7 @@ namespace OBSTallyClient
         OBSWebsocket mainWebsocket = new OBSWebsocket();
         XmlDocument xmlDoc = new XmlDocument();
 
+        // Public variables
         public string source1;
         public string source2;
         public string source3;
@@ -23,6 +24,9 @@ namespace OBSTallyClient
 
         public string currentScene;
         public string previewScene;
+
+        public int button2_ClickCount = 1;
+        
         public bool exitFlag = false;
 
         public Label newLabel;
@@ -44,7 +48,7 @@ namespace OBSTallyClient
 
             try
             {
-                loadXML(); // Load the XML file, catch if it doesn't exist
+                loadConfigXML(); // Load the XML file, catch if it doesn't exist
                 exitFlag = true;
             }
             catch (FileNotFoundException ex1) //if Config doesn't exist, show setupPopup
@@ -53,7 +57,7 @@ namespace OBSTallyClient
                 var setupResult = setItUp.ShowDialog();
                 if (setItUp.exitFlag == true)
                 {
-                    loadXML();
+                    loadConfigXML();
                     exitFlag = true;
                 }
             }
@@ -81,7 +85,7 @@ namespace OBSTallyClient
             }
         }
 
-        private void loadXML()
+        private void loadConfigXML()
         {
             xmlDoc.Load(Application.StartupPath + "\\config.xml");
             XmlNode first = xmlDoc.SelectSingleNode("root/Source1");
@@ -161,46 +165,55 @@ namespace OBSTallyClient
                     //label5.Text = "Bad scene name!";
                 }
 
-                //// PREVIEW SCENES ////
-                if (previewScene == source1)
+
+                if (button2.Text == "Previews ON")
                 {
-                    oldprevLabel = prevLabel;
-                    prevLabel = label1;
-                    serialPort1.Write("5\r\n");
-                    label5.Text = serialPort1.PortName;
-                }
-                else if (previewScene == source2)
-                {
-                    oldprevLabel = prevLabel;
-                    prevLabel = label2;
-                    serialPort1.Write("6\r\n");
-                    label5.Text = serialPort1.PortName;
-                }
-                else if (previewScene == source3)
-                {
-                    oldprevLabel = prevLabel;
-                    prevLabel = label3;
-                    serialPort1.Write("7\r\n");
-                    label5.Text = serialPort1.PortName;
-                }
-                else if (previewScene == source4)
-                {
-                    oldprevLabel = prevLabel;
-                    prevLabel = label4;
-                    serialPort1.Write("8\r\n");
-                    label5.Text = serialPort1.PortName;
+                    //// PREVIEW SCENES ////
+                    if (previewScene == source1)
+                    {
+                        oldprevLabel = prevLabel;
+                        prevLabel = label1;
+                        serialPort1.Write("5\r\n");
+                        label5.Text = serialPort1.PortName;
+                    }
+                    else if (previewScene == source2)
+                    {
+                        oldprevLabel = prevLabel;
+                        prevLabel = label2;
+                        serialPort1.Write("6\r\n");
+                        label5.Text = serialPort1.PortName;
+                    }
+                    else if (previewScene == source3)
+                    {
+                        oldprevLabel = prevLabel;
+                        prevLabel = label3;
+                        serialPort1.Write("7\r\n");
+                        label5.Text = serialPort1.PortName;
+                    }
+                    else if (previewScene == source4)
+                    {
+                        oldprevLabel = prevLabel;
+                        prevLabel = label4;
+                        serialPort1.Write("8\r\n");
+                        label5.Text = serialPort1.PortName;
+                    }
+                    else
+                    {
+                        oldprevLabel = prevLabel;
+                        prevLabel = label5;
+                        serialPort1.Write("9\r\n");
+                        //label5.Text = "Bad preview name!";
+                    }
+                    oldprevLabel.BackColor = Color.Gray;
+                    prevLabel.BackColor = Color.Green;
                 }
                 else
                 {
-                    oldprevLabel = prevLabel;
-                    prevLabel = label5;
-                    serialPort1.Write("9\r\n");
-                    //label5.Text = "Bad preview name!";
+                    oldprevLabel.BackColor = Color.Gray;
+                    oldLabel.BackColor = Color.Gray;
                 }
 
-                oldprevLabel.BackColor = Color.Gray;
                 oldLabel.BackColor = Color.Gray;
-                prevLabel.BackColor = Color.Green;
                 newLabel.BackColor = Color.Red;
             }
             catch (System.InvalidOperationException)
@@ -244,6 +257,19 @@ namespace OBSTallyClient
             this.Close();
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (button2_ClickCount % 2 == 0) //If button2_ClickCount is even
+            {
+                button2.Text = "Previews ON";
+            }
+            else                             //If button2_ClickCount is odd
+            {
+                button2.Text = "Previews OFF";
+            }
+            button2_ClickCount = button2_ClickCount + 1;
+        }
+
         private void label5_Click(object sender, EventArgs e)
         {
 
@@ -251,7 +277,6 @@ namespace OBSTallyClient
 
         private void MainProgram_Resize(object sender, EventArgs e)
         {
-
             if (FormWindowState.Minimized == this.WindowState)
             {
                 notifyIcon1.Visible = true;
