@@ -45,6 +45,7 @@ namespace OBSTallyClient
             // Initialize labels
             newLabel = label5; //debug label
             prevLabel = label5; //debug label
+            oldprevLabel = label5; //preallocate
 
             try
             {
@@ -162,7 +163,6 @@ namespace OBSTallyClient
                     oldLabel = newLabel;
                     newLabel = label5;
                     serialPort1.Write("4\r\n");
-                    //label5.Text = "Bad scene name!";
                 }
 
 
@@ -202,7 +202,6 @@ namespace OBSTallyClient
                         oldprevLabel = prevLabel;
                         prevLabel = label5;
                         serialPort1.Write("9\r\n");
-                        //label5.Text = "Bad preview name!";
                     }
                     oldprevLabel.BackColor = Color.Gray;
                     prevLabel.BackColor = Color.Green;
