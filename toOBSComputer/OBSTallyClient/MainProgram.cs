@@ -1,19 +1,18 @@
 ﻿
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using OBSWebsocketDotNet;
-//using OBSWebsocketDotNet.Types;
 using System.Drawing;
 using System.Xml;
-//using System.Threading;
+using System.Linq;
 
 namespace OBSTallyClient
 {
     public partial class MainProgram : Form
     {
         OBSWebsocket mainWebsocket = new OBSWebsocket();
-        XmlDocument xmlDoc = new XmlDocument();
 
         // Public variables
         public string source1;
@@ -22,30 +21,23 @@ namespace OBSTallyClient
         public string source4;
         public string wsPassword;
 
-        public string currentScene;
-        public string previewScene;
-
         public int button2_ClickCount = 1;
-        
+        public int lastbutton2State = 1;
         public bool exitFlag = false;
 
-        public Label newLabel;
-        public Label prevLabel;
-        public Label oldLabel;
-        public Label oldprevLabel;
-        
+        public string lastLiveScene;
+        public string lastPreviewScene;
+        public List<OBSWebsocketDotNet.Types.SceneItem> LiveSceneSources = new List<OBSWebsocketDotNet.Types.SceneItem>();
+        public List<OBSWebsocketDotNet.Types.SceneItem> PreviewSceneSources = new List<OBSWebsocketDotNet.Types.SceneItem>();
+
         public MainProgram()
         {
             InitializeComponent();
         }
 
+        // On Load
         private void Form1_Load(object sender, EventArgs e)
         {
-
-            // Initialize labels
-            newLabel = label5; //debug label
-            prevLabel = label5; //debug label
-            oldprevLabel = label5; //preallocate
 
             try
             {
@@ -71,10 +63,8 @@ namespace OBSTallyClient
             {
                 //TO DO: set a websocket timeout: https://stackoverflow.com/questions/13546424/how-to-wait-for-a-websockets-readystate-to-change
                 mainWebsocket.Connect("ws://127.0.0.1:4444", wsPassword);
-                label1.BackColor = Color.Gray;
-                label2.BackColor = Color.Gray;
-                label3.BackColor = Color.Gray;
-                label4.BackColor = Color.Gray;
+                lastLiveScene = mainWebsocket.GetCurrentScene().Name; //Initialize lastLiveScene at the current live scene
+                GrayAllLabels(); //Gray out all labels
             }
             catch (OBSWebsocketDotNet.AuthFailureException)
             {
@@ -86,134 +76,92 @@ namespace OBSTallyClient
             }
         }
 
-        private void loadConfigXML()
-        {
-            xmlDoc.Load(Application.StartupPath + "\\config.xml");
-            XmlNode first = xmlDoc.SelectSingleNode("root/Source1");
-            source1 = first.Attributes["name"].Value;
-            XmlNode second = xmlDoc.SelectSingleNode("root/Source2");
-            source2 = second.Attributes["name"].Value;
-            XmlNode third = xmlDoc.SelectSingleNode("root/Source3");
-            source3 = third.Attributes["name"].Value;
-            XmlNode fourth = xmlDoc.SelectSingleNode("root/Source4");
-            source4 = fourth.Attributes["name"].Value;
-            XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
-            wsPassword = wesPass.Attributes["password"].Value;
-        }
-
+        // Main loop //
         private void timer1_Tick(object sender, EventArgs e) // Loops continuously 100ms
         {
+            
             try //try even if serial port is closed
             {
                 // Prevent running of websockets if config file doesn't exist.
-                // Otherwise these values initialize as nulls.
+                // Otherwise these values initialize as nulls, and everything crashes.
                 if (exitFlag == true)
                 {
-                    // Get current and preview scene names
-                    currentScene = mainWebsocket.GetCurrentScene().Name;
-                    previewScene = mainWebsocket.GetPreviewScene().Name;
 
-                    // List all sources in active scene
-                    var currentSceneSources = mainWebsocket.GetCurrentScene().Items;
-                    foreach (var item in currentSceneSources)
+                    ////////////// LIVE //////////////
+                    // Get current live scene name
+                    string currentLiveScene = mainWebsocket.GetCurrentScene().Name;
+
+                    // List all sources in current live scene
+                    LiveSceneSources = mainWebsocket.GetCurrentScene().Items;
+                    
+                    // Label colors (LIVE)
+                    if (currentLiveScene != lastLiveScene) //If live scene state changes
                     {
-                        //Console.WriteLine(item.SourceName);
+                        Console.WriteLine("Live state has changed"); //Debugging
+                        GrayAllLabels(); //Gray out all labels
+                        RefreshLabels(LiveSceneSources, Color.Red); //Refresh all live labels
+                        lastLiveScene = currentLiveScene; //Update scene state
                     }
 
-                    // List all sources in preview scene
-                    var previewSceneSources = mainWebsocket.GetPreviewScene().Items;
-                    foreach (var item in previewSceneSources)
+                    // Serial writes (LIVE)
+                    foreach (var live in LiveSceneSources)
                     {
-                        //Console.WriteLine(item.SourceName);
+                        //Console.WriteLine(live.SourceName);
+                        //// ACTIVE SCENES ////
+                        if (live.SourceName == source1) { serialPort1.Write("0\r\n"); }
+                        else if (live.SourceName == source2) { serialPort1.Write("1\r\n"); }
+                        else if (live.SourceName == source3) { serialPort1.Write("2\r\n"); }
+                        else if (live.SourceName == source4) {  serialPort1.Write("3\r\n"); }
+                        else { serialPort1.Write("4\r\n"); }
                     }
 
-                }
+                    ////////////// PREVIEW //////////////
+                    // If previews are turned ON
+                    if (button2.Text == "Previews ON")
+                    {
 
-                //// ACTIVE SCENES ////
-                if (currentScene == source1)
-                {
-                    oldLabel = newLabel;
-                    newLabel = label1;
-                    serialPort1.Write("0\r\n");
-                    label5.Text = serialPort1.PortName;
-                }
-                else if (currentScene == source2)
-                {
-                    oldLabel = newLabel;
-                    newLabel = label2;
-                    serialPort1.Write("1\r\n");
-                    label5.Text = serialPort1.PortName;
-                }
-                else if (currentScene == source3)
-                {
-                    oldLabel = newLabel;
-                    newLabel = label3;
-                    serialPort1.Write("2\r\n");
-                    label5.Text = serialPort1.PortName;
-                }
-                else if (currentScene == source4)
-                {
-                    oldLabel = newLabel;
-                    newLabel = label4;
-                    serialPort1.Write("3\r\n");
-                    label5.Text = serialPort1.PortName;
-                }
-                else
-                {
-                    oldLabel = newLabel;
-                    newLabel = label5;
-                    serialPort1.Write("4\r\n");
-                }
+                        // Get current preview scene name
+                        string currentPreviewScene = mainWebsocket.GetPreviewScene().Name;
 
+                        // List all sources in current preview scene
+                        PreviewSceneSources = mainWebsocket.GetPreviewScene().Items;
 
-                if (button2.Text == "Previews ON")
-                {
-                    //// PREVIEW SCENES ////
-                    if (previewScene == source1)
-                    {
-                        oldprevLabel = prevLabel;
-                        prevLabel = label1;
-                        serialPort1.Write("5\r\n");
-                        label5.Text = serialPort1.PortName;
-                    }
-                    else if (previewScene == source2)
-                    {
-                        oldprevLabel = prevLabel;
-                        prevLabel = label2;
-                        serialPort1.Write("6\r\n");
-                        label5.Text = serialPort1.PortName;
-                    }
-                    else if (previewScene == source3)
-                    {
-                        oldprevLabel = prevLabel;
-                        prevLabel = label3;
-                        serialPort1.Write("7\r\n");
-                        label5.Text = serialPort1.PortName;
-                    }
-                    else if (previewScene == source4)
-                    {
-                        oldprevLabel = prevLabel;
-                        prevLabel = label4;
-                        serialPort1.Write("8\r\n");
-                        label5.Text = serialPort1.PortName;
-                    }
+                        // Label colors (PREVIEW)
+                        if (currentPreviewScene != lastPreviewScene) //If preview scene state changes
+                        {
+                            Console.WriteLine("Preview state has changed"); //Debugging
+                            GrayAllLabels(); //Gray out all labels
+                            RefreshLabels(PreviewSceneSources, Color.Green); //Set label colors for preview sources
+                            RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
+                            lastPreviewScene = currentPreviewScene; //Update preview scene state
+                        }
+
+                        // Serial writes (PREVIEW)
+                        foreach (var preview in PreviewSceneSources)
+                        {
+                            //Console.WriteLine(preview.SourceName);
+                            //// PREVIEW SCENES ////
+                            if (preview.SourceName == source1) { serialPort1.Write("5\r\n"); }
+                            else if (preview.SourceName == source2) { serialPort1.Write("6\r\n"); }
+                            else if (preview.SourceName == source3) { serialPort1.Write("7\r\n"); }
+                            else if (preview.SourceName == source4) { serialPort1.Write("8\r\n"); }
+                            else { serialPort1.Write("9\r\n"); }
+                        }
+
+                    }//end if previews ON check
                     else
                     {
-                        oldprevLabel = prevLabel;
-                        prevLabel = label5;
-                        serialPort1.Write("9\r\n");
-                    }
-                    oldprevLabel.BackColor = Color.Gray;
-                    prevLabel.BackColor = Color.Green;
-                }
-                else
-                {
-                    oldprevLabel.BackColor = Color.Gray;
-                    oldLabel.BackColor = Color.Gray;
-                }
+                        if (lastbutton2State != button2_ClickCount)
+                        {
+                            Console.WriteLine("Previews off."); //Debugging
+                            GrayAllLabels(); //Gray out all labels
+                            RefreshLabels(LiveSceneSources, Color.Red); //Refresh live labels
+                            lastbutton2State = button2_ClickCount; //Update lastbutton2State
+                        }
+                    }//end else previews ON check
 
-                oldLabel.BackColor = Color.Gray;
-                newLabel.BackColor = Color.Red;
+                }//end exitFlag check
+                
             }
             catch (System.InvalidOperationException)
             {
@@ -223,18 +171,42 @@ namespace OBSTallyClient
             {
 
             }
+
+        }
+
+        private void RefreshLabels(List<OBSWebsocketDotNet.Types.SceneItem> SceneSources, Color color)
+        {
+            //Update labels
+            foreach (var live in SceneSources)
+            {
+                if (live.SourceName == source1) { label1.BackColor = color; }
+                else if (live.SourceName == source2) { label2.BackColor = color; }
+                else if (live.SourceName == source3) { label3.BackColor = color; }
+                else if (live.SourceName == source4) { label4.BackColor = color; }
+                else { label5.BackColor = color; }
+            }
+        }
+
+        private void GrayAllLabels()
+        {
+            //Gray out all
+            label1.BackColor = Color.Gray;
+            label2.BackColor = Color.Gray;
+            label3.BackColor = Color.Gray;
+            label4.BackColor = Color.Gray;
+            label5.BackColor = Color.Gray;
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             serialPort1.Close();
             serialPort1.PortName = comboBox1.Text;
-            label5.Text = serialPort1.PortName;
             if (serialPort1 != null)
             {
                 try
                 {
                     serialPort1.Open();
+                    label5.Text = serialPort1.PortName;
                 }
                 catch
                 {
@@ -291,6 +263,22 @@ namespace OBSTallyClient
         {
             this.Show();
             this.WindowState = FormWindowState.Normal;
+        }
+
+        private void loadConfigXML()
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(Application.StartupPath + "\\config.xml");
+            XmlNode first = xmlDoc.SelectSingleNode("root/Source1");
+            source1 = first.Attributes["name"].Value;
+            XmlNode second = xmlDoc.SelectSingleNode("root/Source2");
+            source2 = second.Attributes["name"].Value;
+            XmlNode third = xmlDoc.SelectSingleNode("root/Source3");
+            source3 = third.Attributes["name"].Value;
+            XmlNode fourth = xmlDoc.SelectSingleNode("root/Source4");
+            source4 = fourth.Attributes["name"].Value;
+            XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
+            wsPassword = wesPass.Attributes["password"].Value;
         }
 
     }
