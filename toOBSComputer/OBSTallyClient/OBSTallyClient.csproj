@@ -46,8 +46,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-	<LangVersion>latest</LangVersion>
-	<NullableReferenceTypes>true</NullableReferenceTypes>
+    <LangVersion>latest</LangVersion>
+    <NullableReferenceTypes>true</NullableReferenceTypes>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -75,7 +75,7 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>latest</LangVersion>
-	<NullableReferenceTypes>true</NullableReferenceTypes>
+    <NullableReferenceTypes>true</NullableReferenceTypes>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
