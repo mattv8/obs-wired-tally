@@ -6,8 +6,6 @@ using System.Windows.Forms;
 using OBSWebsocketDotNet;
 using System.Drawing;
 using System.Xml;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OBSTallyClient
 {
@@ -64,11 +62,11 @@ namespace OBSTallyClient
             try
             {
                 mainWebsocket.Connect("ws://127.0.0.1:4444", wsPassword);
-                bool connected = mainWebsocket.IsConnected; //Rudimentary connection check
                 if (mainWebsocket.IsConnected)
                 {
                     lastLiveScene = mainWebsocket.GetCurrentScene().Name; //Initialize lastLiveScene at the current live scene
-                    GrayAllLabels(); //Gray out all labels
+                    RefreshLabels(PreviewSceneSources, Color.Green); //Set label colors for preview sources
+                    RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
                 }
                 else
                 {
@@ -98,6 +96,7 @@ namespace OBSTallyClient
             {
                 GrayAllLabels();
                 exitFlag = false;
+
                 if (!messageShown)
                 {
                     messageShown = true;
@@ -124,7 +123,7 @@ namespace OBSTallyClient
             {
                 // Prevent running of websockets if config file doesn't exist.
                 // Otherwise these values initialize as nulls, and everything crashes.
-                if (exitFlag == true)
+                if (exitFlag == true && mainWebsocket.IsConnected)
                 {
 
                     ////////////// LIVE //////////////
