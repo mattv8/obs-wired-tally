@@ -7,6 +7,7 @@ using OBSWebsocketDotNet;
 using System.Drawing;
 using System.Xml;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OBSTallyClient
 {
@@ -24,6 +25,7 @@ namespace OBSTallyClient
         public int button2_ClickCount = 1;
         public int lastbutton2State = 1;
         public bool exitFlag = false;
+        public bool messageShown = false;
 
         public string lastLiveScene;
         public string lastPreviewScene;
@@ -61,10 +63,17 @@ namespace OBSTallyClient
 
             try
             {
-                //TO DO: set a websocket timeout: https://stackoverflow.com/questions/13546424/how-to-wait-for-a-websockets-readystate-to-change
                 mainWebsocket.Connect("ws://127.0.0.1:4444", wsPassword);
-                lastLiveScene = mainWebsocket.GetCurrentScene().Name; //Initialize lastLiveScene at the current live scene
-                GrayAllLabels(); //Gray out all labels
+                bool connected = mainWebsocket.IsConnected; //Rudimentary connection check
+                if (mainWebsocket.IsConnected)
+                {
+                    lastLiveScene = mainWebsocket.GetCurrentScene().Name; //Initialize lastLiveScene at the current live scene
+                    GrayAllLabels(); //Gray out all labels
+                }
+                else
+                {
+                    exitFlag = false;
+                }
             }
             catch (OBSWebsocketDotNet.AuthFailureException)
             {
@@ -72,7 +81,38 @@ namespace OBSTallyClient
             }
             catch
             {
-                MessageBox.Show("Failed to connect with OBS. Is OBS open?");
+                MessageBox.Show("An unspecified error occured.", "FAILED TO LOAD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        
+        }
+
+        // Poll websockets until connected.
+        private void timer2_Tick(object sender, EventArgs e) // Loops continuously 100ms
+        {
+            if (mainWebsocket.IsConnected)
+            {
+                exitFlag = true;
+                messageShown = false;
+            }
+            else
+            {
+                GrayAllLabels();
+                exitFlag = false;
+                if (!messageShown)
+                {
+                    messageShown = true;
+                    DialogResult result = MessageBox.Show("Please verify the following:\n" +
+                        "1. OBS is open and running.\n2. OBS Websockets is installed and enabled. \n\nWould you like to attempt to reconnect?", "Failed to connect to OBS", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                    if (result == DialogResult.Yes)
+                    {
+                        Form1_Load(sender, e);
+                        messageShown = false;
+                    }
+                    else if (result == DialogResult.No)
+                    {
+                        this.Close();
+                    }
+                }
             }
         }
 
@@ -287,6 +327,6 @@ namespace OBSTallyClient
             XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
             wsPassword = wesPass.Attributes["password"].Value;
         }
-
+ 
     }
 }
