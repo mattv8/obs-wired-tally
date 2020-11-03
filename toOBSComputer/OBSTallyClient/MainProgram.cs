@@ -54,9 +54,9 @@ namespace OBSTallyClient
                     exitFlag = true;
                 }
             }
-            catch (Exception ex2)
+            catch
             {
-                MessageBox.Show("An unspecified error occured.", "FAILED TO LOAD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                
             }
 
             try
@@ -79,7 +79,7 @@ namespace OBSTallyClient
             }
             catch
             {
-                MessageBox.Show("An unspecified error occured.", "FAILED TO LOAD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                
             }
         
         }
@@ -101,7 +101,10 @@ namespace OBSTallyClient
                 {
                     messageShown = true;
                     DialogResult result = MessageBox.Show("Please verify the following:\n" +
-                        "1. OBS is open and running.\n2. OBS Websockets is installed and enabled. \n\nWould you like to attempt to reconnect?", "Failed to connect to OBS", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                        "1. OBS is open and running.\n" +
+                        "2. OBS Websockets is installed and enabled.\n\n" +
+                        "Would you like to attempt to reconnect?", "OBS TALLY: Lost connection to OBS",
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                     if (result == DialogResult.Yes)
                     {
                         Form1_Load(sender, e);
