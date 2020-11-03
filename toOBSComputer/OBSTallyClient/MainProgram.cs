@@ -119,6 +119,13 @@ namespace OBSTallyClient
                     // If previews are turned ON
                     if (button2.Text == "Previews ON")
                     {
+                        // Update previews after prieview on/off is toggled
+                        if (lastbutton2State != button2_ClickCount)
+                        {
+                            Console.WriteLine("Previews on."); //Debugging
+                            RefreshLabels(PreviewSceneSources, Color.Green); //Refresh preview labels
+                            lastbutton2State = button2_ClickCount; //Update lastbutton2State
+                        }
 
                         // Get current preview scene name
                         string currentPreviewScene = mainWebsocket.GetPreviewScene().Name;
