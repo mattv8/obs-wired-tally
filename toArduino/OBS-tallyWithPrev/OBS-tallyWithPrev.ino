@@ -149,12 +149,14 @@ void loop(void) {
     if(currentPreview != lastPreview) { //If preview state changes
         fill_solid( ledarray[lastPreview], NUM_LEDS, CRGB::Black ); // Clear pixel data if state changes
         lastPreview = currentPreview; //Update preview state
+        Serial.println("Preview state has changed.");
     }
     
     // Live State //
     if(currentLive != lastLive) { //If live state changes
       fill_solid( ledarray[lastLive], NUM_LEDS, CRGB::Black ); // Clear pixel data if state changes
       lastLive = currentLive; //Update live state
+      Serial.println("Live state has changed.");
     }
 
     // Update LED Color States //

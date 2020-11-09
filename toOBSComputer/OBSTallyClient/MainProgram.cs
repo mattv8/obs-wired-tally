@@ -1,11 +1,13 @@
 ﻿
 using System;
 using System.IO;
+using System.IO.Ports;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using OBSWebsocketDotNet;
 using System.Drawing;
 using System.Xml;
+//using System.Threading;
 
 namespace OBSTallyClient
 {
@@ -68,149 +70,102 @@ namespace OBSTallyClient
                     RefreshLabels(PreviewSceneSources, Color.Green); //Set label colors for preview sources
                     RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
                 }
-                else
-                {
-                    exitFlag = false;
-                }
             }
             catch (OBSWebsocketDotNet.AuthFailureException)
             {
-                MessageBox.Show("Failed to connect with OBS: Websocket authentication has failed. Please run the setup again and verify the password is correct.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to connect with OBS: Websocket authentication has failed." +
+                    " Please run the setup again and verify the password is correct.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch
             {
                 
             }
-        
-        }
-
-        // Poll websockets until connected.
-        private void timer2_Tick(object sender, EventArgs e) // Loops continuously 100ms
-        {
-            if (mainWebsocket.IsConnected)
-            {
-                exitFlag = true;
-                messageShown = false;
-            }
-            else
-            {
-                GrayAllLabels();
-                exitFlag = false;
-
-                if (!messageShown)
-                {
-                    messageShown = true;
-                    DialogResult result = MessageBox.Show("Please verify the following:\n" +
-                        "1. OBS is open and running.\n" +
-                        "2. OBS Websockets is installed and enabled.\n\n" +
-                        "Would you like to attempt to reconnect?", "OBS TALLY: Lost connection to OBS",
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
-                    if (result == DialogResult.Yes)
-                    {
-                        Form1_Load(sender, e);
-                        messageShown = false;
-                    }
-                    else if (result == DialogResult.No)
-                    {
-                        this.Close();
-                    }
-                }
-            }
         }
 
         // Main loop //
-        private void timer1_Tick(object sender, EventArgs e) // Loops continuously 100ms
+        private void MainLoop(object sender, EventArgs e) // Loops continuously 100ms
         {
             
             try //try even if serial port is closed
             {
+
                 // Prevent running of websockets if config file doesn't exist.
                 // Otherwise these values initialize as nulls, and everything crashes.
-                if (exitFlag == true && mainWebsocket.IsConnected)
+                if (exitFlag == true && mainWebsocket.IsConnected && serialPort1 != null)
                 {
 
-                    ////////////// LIVE //////////////
-                    // Get current live scene name
-                    string currentLiveScene = mainWebsocket.GetCurrentScene().Name;
+                    ////////////// Update Websocket Variables //////////////
+                    string currentLiveScene = mainWebsocket.GetCurrentScene().Name; // Get current live scene name
+                    LiveSceneSources = mainWebsocket.GetCurrentScene().Items; // List all sources in current live scene
+                    string currentPreviewScene = mainWebsocket.GetPreviewScene().Name; // Get current preview scene name
+                    PreviewSceneSources = mainWebsocket.GetPreviewScene().Items; // List all sources in current preview scene
 
-                    // List all sources in current live scene
-                    LiveSceneSources = mainWebsocket.GetCurrentScene().Items;
-                    
-                    // Label colors (LIVE)
+                    ////////////// LIVE //////////////
                     if (currentLiveScene != lastLiveScene) //If live scene state changes
                     {
-                        Console.WriteLine("Live state has changed"); //Debugging
-                        GrayAllLabels(); //Gray out all labels
+                        //Console.WriteLine("Live state has changed"); //Debugging
+                        // Update live label colors for UI app
+                        ColorAllLabels(Color.Gray); //Gray out all labels
                         RefreshLabels(LiveSceneSources, Color.Red); //Refresh all live labels
-                        lastLiveScene = currentLiveScene; //Update scene state
+
+                        // Send serial bits for live to Arduino
+                        foreach (var live in LiveSceneSources)
+                        {
+                            if (live.SourceName == source1) { serialPort1.Write("0\r\n"); }
+                            else if (live.SourceName == source2) { serialPort1.Write("1\r\n"); }
+                            else if (live.SourceName == source3) { serialPort1.Write("2\r\n"); }
+                            else if (live.SourceName == source4) { serialPort1.Write("3\r\n"); }
+                            else { serialPort1.Write("4\r\n"); }
+                        }
+                        lastLiveScene = currentLiveScene; // Finally, update scene state
                     }
 
-                    // Serial writes (LIVE)
-                    foreach (var live in LiveSceneSources)
-                    {
-                        //Console.WriteLine(live.SourceName);
-                        //// ACTIVE SCENES ////
-                        if (live.SourceName == source1) { serialPort1.Write("0\r\n"); }
-                        else if (live.SourceName == source2) { serialPort1.Write("1\r\n"); }
-                        else if (live.SourceName == source3) { serialPort1.Write("2\r\n"); }
-                        else if (live.SourceName == source4) {  serialPort1.Write("3\r\n"); }
-                        else { serialPort1.Write("4\r\n"); }
-                    }
-
-                    ////////////// PREVIEW //////////////
-                    // If previews are turned ON
-                    if (button2.Text == "Previews ON")
+                    ////////////// PREVIEWS //////////////
+                    if (button2.Text == "Previews ON") // If previews are turned ON
                     {
                         // Update previews after prieview on/off is toggled
                         if (lastbutton2State != button2_ClickCount)
                         {
-                            Console.WriteLine("Previews on."); //Debugging
+                            //Console.WriteLine("Previews on."); //Debugging
                             RefreshLabels(PreviewSceneSources, Color.Green); //Refresh preview labels
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
                         }
 
-                        // Get current preview scene name
-                        string currentPreviewScene = mainWebsocket.GetPreviewScene().Name;
-
-                        // List all sources in current preview scene
-                        PreviewSceneSources = mainWebsocket.GetPreviewScene().Items;
-
-                        // Label colors (PREVIEW)
+                        // Update preview label colors for UI app
                         if (currentPreviewScene != lastPreviewScene) //If preview scene state changes
                         {
-                            Console.WriteLine("Preview state has changed"); //Debugging
-                            GrayAllLabels(); //Gray out all labels
+                            //Console.WriteLine("Preview state has changed"); //Debugging
+                            ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(PreviewSceneSources, Color.Green); //Set label colors for preview sources
                             RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
                             lastPreviewScene = currentPreviewScene; //Update preview scene state
-                        }
 
-                        // Serial writes (PREVIEW)
-                        foreach (var preview in PreviewSceneSources)
-                        {
-                            //Console.WriteLine(preview.SourceName);
-                            //// PREVIEW SCENES ////
-                            if (preview.SourceName == source1) { serialPort1.Write("5\r\n"); }
-                            else if (preview.SourceName == source2) { serialPort1.Write("6\r\n"); }
-                            else if (preview.SourceName == source3) { serialPort1.Write("7\r\n"); }
-                            else if (preview.SourceName == source4) { serialPort1.Write("8\r\n"); }
-                            else { serialPort1.Write("9\r\n"); }
+                            // Serial writes (PREVIEW)
+                            foreach (var preview in PreviewSceneSources)
+                            {
+                                //Console.WriteLine(preview.SourceName);
+                                if (preview.SourceName == source1) { serialPort1.Write("5\r\n"); }
+                                else if (preview.SourceName == source2) { serialPort1.Write("6\r\n"); }
+                                else if (preview.SourceName == source3) { serialPort1.Write("7\r\n"); }
+                                else if (preview.SourceName == source4) { serialPort1.Write("8\r\n"); }
+                                else { serialPort1.Write("9\r\n"); }
+                            }
                         }
 
                     }//end if previews ON check
-                    else
+                    else // Previews are toggled off
                     {
-                        if (lastbutton2State != button2_ClickCount)
+                        if (lastbutton2State != button2_ClickCount) // If preview on/off toggle changes
                         {
-                            Console.WriteLine("Previews off."); //Debugging
-                            GrayAllLabels(); //Gray out all labels
+                            //Console.WriteLine("Previews off."); //Debugging
+                            ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(LiveSceneSources, Color.Red); //Refresh live labels
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
                         }
                     }//end else previews ON check
 
                 }//end exitFlag check
-                
+
             }
             catch (System.InvalidOperationException)
             {
@@ -223,27 +178,58 @@ namespace OBSTallyClient
 
         }
 
+        // Poll websockets to check if connected. This loop is for error handling.
+        private void WebsocketHeartbeat(object sender, EventArgs e) // Loops continuously 100ms
+        {
+            if (mainWebsocket.IsConnected)
+            {
+                exitFlag = true;
+                messageShown = false; // Set messageShown flag to false
+            }
+            else
+            {
+                ColorAllLabels(Color.Gray);
+                exitFlag = false;
+
+                if (!messageShown) // If the message hasn't already been shown
+                {
+                    messageShown = true; // Set messageShown flag to true
+                    DialogResult result = MessageBox.Show("Please verify the following:\n" +
+                        "1. OBS is open and running.\n" +
+                        "2. OBS Websockets is installed and enabled.\n\n" +
+                        "Would you like to attempt to reconnect?", "OBS TALLY: Lost connection to OBS",
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                    if (result == DialogResult.Yes)
+                    {
+                        Form1_Load(sender, e); // Re-run setup loop
+                        messageShown = false; // Set messageShown flag to false
+                    }
+                    else if (result == DialogResult.No)
+                    {
+                        this.Close();
+                    }
+                }
+            }
+        }
+
         private void RefreshLabels(List<OBSWebsocketDotNet.Types.SceneItem> SceneSources, Color color)
         {
             //Update labels
-            foreach (var live in SceneSources)
+            foreach (var source in SceneSources)
             {
-                if (live.SourceName == source1) { label1.BackColor = color; }
-                else if (live.SourceName == source2) { label2.BackColor = color; }
-                else if (live.SourceName == source3) { label3.BackColor = color; }
-                else if (live.SourceName == source4) { label4.BackColor = color; }
+                if (source.SourceName == source1) { label1.BackColor = color; }
+                else if (source.SourceName == source2) { label2.BackColor = color; }
+                else if (source.SourceName == source3) { label3.BackColor = color; }
+                else if (source.SourceName == source4) { label4.BackColor = color; }
                 else { label5.BackColor = color; }
             }
         }
 
-        private void GrayAllLabels()
+            private void ColorAllLabels(Color color)
         {
-            //Gray out all
-            label1.BackColor = Color.Gray;
-            label2.BackColor = Color.Gray;
-            label3.BackColor = Color.Gray;
-            label4.BackColor = Color.Gray;
-            label5.BackColor = Color.Gray;
+            label1.BackColor = color;   label2.BackColor = color;
+            label3.BackColor = color;   label4.BackColor = color;
+            label5.BackColor = color;
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -254,8 +240,9 @@ namespace OBSTallyClient
             {
                 try
                 {
-                    serialPort1.Open();
+                    serialPort1.Open(); //serialPort1.Close(); //Try opening and closing the port to test connectivity
                     label5.Text = serialPort1.PortName;
+                    serialPort1.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived); //Initialize data recieved event handler
                 }
                 catch
                 {
@@ -264,9 +251,21 @@ namespace OBSTallyClient
             }
         }
 
-        private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
+            // See example here: https://stackoverflow.com/questions/16215741/c-sharp-read-only-serial-port-when-data-comes
+            // https://forum.arduino.cc/index.php?topic=40336.0
+            //if (serialPort1.ReadLine() != string.Empty)
+            //{
+                string line = serialPort1.ReadLine();
+                BeginInvoke(new LineReceivedEvent(LineReceived), line);
+            //}
+        }
 
+        private delegate void LineReceivedEvent(string line);
+        private void LineReceived(string line)
+        {
+            Console.Write("From Arduino: " + line);
         }
 
         private void button1_Click(object sender, EventArgs e)

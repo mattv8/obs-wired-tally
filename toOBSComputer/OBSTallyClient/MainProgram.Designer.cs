@@ -36,14 +36,14 @@ namespace OBSTallyClient
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.Main = new System.Windows.Forms.Timer(this.components);
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.button2 = new System.Windows.Forms.Button();
-            this.timer2 = new System.Windows.Forms.Timer(this.components);
+            this.WSHeartbeat = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // label1
@@ -70,13 +70,17 @@ namespace OBSTallyClient
             this.label4.BackColor = System.Drawing.Color.Blue;
             this.label4.Name = "label4";
             // 
-            // timer1
+            // Main
             // 
-            this.timer1.Enabled = true;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.Main.Enabled = true;
+            this.Main.Tick += new System.EventHandler(this.MainLoop);
             // 
             // serialPort1
             // 
+            this.serialPort1.DiscardNull = true;
+            this.serialPort1.DtrEnable = true;
+            this.serialPort1.PortName = "COM10";
+            this.serialPort1.RtsEnable = true;
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
             // 
             // comboBox1
@@ -123,11 +127,11 @@ namespace OBSTallyClient
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // timer2
+            // WSHeartbeat
             // 
-            this.timer2.Enabled = true;
-            this.timer2.Interval = 1000;
-            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
+            this.WSHeartbeat.Enabled = true;
+            this.WSHeartbeat.Interval = 1000;
+            this.WSHeartbeat.Tick += new System.EventHandler(this.WebsocketHeartbeat);
             // 
             // MainProgram
             // 
@@ -157,14 +161,14 @@ namespace OBSTallyClient
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer Main;
         private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Timer timer2;
+        private System.Windows.Forms.Timer WSHeartbeat;
     }
 }
 
