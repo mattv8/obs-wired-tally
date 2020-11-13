@@ -252,8 +252,11 @@
   <data name="&gt;&gt;label4.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
+  <metadata name="Main.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <metadata name="serialPort1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>234, 20</value>
+    <value>337, 17</value>
   </metadata>
   <data name="comboBox1.Items" xml:space="preserve">
     <value>COM1</value>
@@ -373,7 +376,7 @@
     <value>2</value>
   </data>
   <metadata name="notifyIcon1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>12, 15</value>
+    <value>143, 17</value>
   </metadata>
   <data name="notifyIcon1.BalloonTipText" xml:space="preserve">
     <value>OBS Tally is running in the background.</value>
@@ -895,7 +898,7 @@
     <value>0</value>
   </data>
   <metadata name="WSHeartbeat.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>434, 13</value>
+    <value>524, 17</value>
   </metadata>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -1399,7 +1402,13 @@
     <value>6, 8, 6, 8</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>OBS Tally 3.0</value>
+    <value>OBS Tally 3.1</value>
+  </data>
+  <data name="&gt;&gt;Main.Name" xml:space="preserve">
+    <value>Main</value>
+  </data>
+  <data name="&gt;&gt;Main.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Timer, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;serialPort1.Name" xml:space="preserve">
     <value>serialPort1</value>

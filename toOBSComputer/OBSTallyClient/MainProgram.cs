@@ -103,20 +103,15 @@ namespace OBSTallyClient
                     ////////////// LIVE //////////////
                     if (currentLiveScene != lastLiveScene) //If live scene state changes
                     {
-                        //Console.WriteLine("Live state has changed"); //Debugging
+                        Console.WriteLine("Live state has changed"); //Debugging
                         // Update live label colors for UI app
                         ColorAllLabels(Color.Gray); //Gray out all labels
                         RefreshLabels(LiveSceneSources, Color.Red); //Refresh all live labels
 
-                        // Send serial bits for live to Arduino
-                        foreach (var live in LiveSceneSources)
-                        {
-                            if (live.SourceName == source1) { serialPort1.Write("0\r\n"); }
-                            else if (live.SourceName == source2) { serialPort1.Write("1\r\n"); }
-                            else if (live.SourceName == source3) { serialPort1.Write("2\r\n"); }
-                            else if (live.SourceName == source4) { serialPort1.Write("3\r\n"); }
-                            else { serialPort1.Write("4\r\n"); }
-                        }
+                        // Send write (LIVE)
+                        serialPort1.Write("51,"); // Send live state change bit to Arduino
+                        SendSerial(LiveSceneSources); // Send live scene bits to Arduino
+
                         lastLiveScene = currentLiveScene; // Finally, update scene state
                     }
 
@@ -134,22 +129,16 @@ namespace OBSTallyClient
                         // Update preview label colors for UI app
                         if (currentPreviewScene != lastPreviewScene) //If preview scene state changes
                         {
-                            //Console.WriteLine("Preview state has changed"); //Debugging
+                            Console.WriteLine("Preview state has changed"); //Debugging
                             ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(PreviewSceneSources, Color.Green); //Set label colors for preview sources
                             RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
                             lastPreviewScene = currentPreviewScene; //Update preview scene state
 
                             // Serial writes (PREVIEW)
-                            foreach (var preview in PreviewSceneSources)
-                            {
-                                //Console.WriteLine(preview.SourceName);
-                                if (preview.SourceName == source1) { serialPort1.Write("5\r\n"); }
-                                else if (preview.SourceName == source2) { serialPort1.Write("6\r\n"); }
-                                else if (preview.SourceName == source3) { serialPort1.Write("7\r\n"); }
-                                else if (preview.SourceName == source4) { serialPort1.Write("8\r\n"); }
-                                else { serialPort1.Write("9\r\n"); }
-                            }
+                            serialPort1.Write("50,"); // Send preview state change
+                            SendSerial(PreviewSceneSources); // Send preview scene serial bits to Arduino
+ 
                         }
 
                     }//end if previews ON check
@@ -157,7 +146,7 @@ namespace OBSTallyClient
                     {
                         if (lastbutton2State != button2_ClickCount) // If preview on/off toggle changes
                         {
-                            //Console.WriteLine("Previews off."); //Debugging
+                            Console.WriteLine("Previews off."); //Debugging
                             ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(LiveSceneSources, Color.Red); //Refresh live labels
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
@@ -223,9 +212,24 @@ namespace OBSTallyClient
                 else if (source.SourceName == source4) { label4.BackColor = color; }
                 else { label5.BackColor = color; }
             }
+
         }
 
-            private void ColorAllLabels(Color color)
+        private void SendSerial(List<OBSWebsocketDotNet.Types.SceneItem> SceneSources)
+        {
+            foreach (var source in SceneSources)
+            {
+                if (source.SourceName == source1) { serialPort1.Write("0,"); }
+                else if (source.SourceName == source2) { serialPort1.Write("1,"); }
+                else if (source.SourceName == source3) { serialPort1.Write("2,"); }
+                else if (source.SourceName == source4) { serialPort1.Write("3,"); }
+                else { serialPort1.Write("4,"); }
+            }
+            //serialPort1.Write("*"); // Send stop bit
+            serialPort1.Write("*\r\n"); // Send stop bit
+        }
+
+        private void ColorAllLabels(Color color)
         {
             label1.BackColor = color;   label2.BackColor = color;
             label3.BackColor = color;   label4.BackColor = color;
@@ -240,7 +244,7 @@ namespace OBSTallyClient
             {
                 try
                 {
-                    serialPort1.Open(); //serialPort1.Close(); //Try opening and closing the port to test connectivity
+                    serialPort1.Open(); //Try opening the port to test connectivity
                     label5.Text = serialPort1.PortName;
                     serialPort1.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived); //Initialize data recieved event handler
                 }
