@@ -24,7 +24,7 @@ namespace OBSTallyClient
 
         public int button2_ClickCount = 1;
         public int lastbutton2State = 1;
-        public bool exitFlag = false;
+        public bool configComplete = false;
         public bool messageShown = false;
 
         public string lastLiveScene;
@@ -44,16 +44,17 @@ namespace OBSTallyClient
             try
             {
                 loadConfigXML(); // Load the XML file, catch if it doesn't exist
-                exitFlag = true;
+                configComplete = true;
             }
             catch (FileNotFoundException ex1) //if Config doesn't exist, show setupPopup
             {
+                messageShown = true;
                 setupPopup setItUp = new setupPopup();
                 var setupResult = setItUp.ShowDialog();
-                if (setItUp.exitFlag == true)
+                if (setItUp.configComplete == true)
                 {
                     loadConfigXML();
-                    exitFlag = true;
+                    configComplete = true;
                 }
             }
             catch
@@ -67,6 +68,13 @@ namespace OBSTallyClient
                 if (mainWebsocket.IsConnected)
                 {
                     lastLiveScene = mainWebsocket.GetCurrentScene().Name; //Initialize lastLiveScene at the current live scene
+                    
+                    //Update label text
+                    label1.Text = source1; label1.Font = scaleFont(label1);
+                    label2.Text = source2; label2.Font = scaleFont(label2);
+                    label3.Text = source3; label3.Font = scaleFont(label3);
+                    label4.Text = source4; label4.Font = scaleFont(label4);
+                    
                     RefreshLabels(PreviewSceneSources, Color.Green); //Set label colors for preview sources
                     RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
                 }
@@ -91,7 +99,7 @@ namespace OBSTallyClient
 
                 // Prevent running of websockets if config file doesn't exist.
                 // Otherwise these values initialize as nulls, and everything crashes.
-                if (exitFlag == true && mainWebsocket.IsConnected && serialPort1 != null)
+                if (configComplete == true && mainWebsocket.IsConnected && serialPort1 != null)
                 {
 
                     ////////////// Update Websocket Variables //////////////
@@ -124,6 +132,9 @@ namespace OBSTallyClient
                             //Console.WriteLine("Previews on."); //Debugging
                             RefreshLabels(PreviewSceneSources, Color.Green); //Refresh preview labels
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
+
+                            // Notify Arduino of the change
+                            serialPort1.Write("50,"); SendSerial(PreviewSceneSources); serialPort1.Write("*\r\n"); // Send preview bits to Arduino
                         }
 
                         // Update preview label colors for UI app
@@ -146,14 +157,19 @@ namespace OBSTallyClient
                     {
                         if (lastbutton2State != button2_ClickCount) // If preview on/off toggle changes
                         {
-                            Console.WriteLine("Previews off."); //Debugging
+                            //Console.WriteLine("Previews off."); //Debugging
                             ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(LiveSceneSources, Color.Red); //Refresh live labels
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
+                            
+                            // Notify Arduino of the change
+                            serialPort1.Write("50,"); serialPort1.Write("*\r\n"); // Blank out previews
                         }
                     }//end else previews ON check
 
-                }//end exitFlag check
+                    serialPort1.Write(".*\r\n"); // Send heartbeat bit to Arduino
+
+                }//end configComplete check
 
             }
             catch (System.InvalidOperationException)
@@ -172,13 +188,11 @@ namespace OBSTallyClient
         {
             if (mainWebsocket.IsConnected)
             {
-                exitFlag = true;
                 messageShown = false; // Set messageShown flag to false
             }
             else
             {
                 ColorAllLabels(Color.Gray);
-                exitFlag = false;
 
                 if (!messageShown) // If the message hasn't already been shown
                 {
@@ -203,16 +217,34 @@ namespace OBSTallyClient
 
         private void RefreshLabels(List<OBSWebsocketDotNet.Types.SceneItem> SceneSources, Color color)
         {
-            //Update labels
+
+            //Update label colors
             foreach (var source in SceneSources)
             {
                 if (source.SourceName == source1) { label1.BackColor = color; }
                 else if (source.SourceName == source2) { label2.BackColor = color; }
                 else if (source.SourceName == source3) { label3.BackColor = color; }
                 else if (source.SourceName == source4) { label4.BackColor = color; }
-                else { label5.BackColor = color; }
+                else {
+                    label5.BackColor = color;
+                    if (color == Color.Red) { label5.Text = "Other live source in scene";  }
+                    if (color == Color.Green) { label5.Text = "Other preview source in scene";  }
+                }
             }
+            
+        }
+        private Font scaleFont(Label lab)
+        {
+            SizeF extent = TextRenderer.MeasureText(lab.Text, lab.Font);
 
+            float hRatio = lab.Height / extent.Height;
+            float wRatio = lab.Width / extent.Width;
+            float ratio = (hRatio < wRatio) ? hRatio : wRatio;
+
+            float newSize = lab.Font.Size * ratio;
+
+            lab.Font = new Font(lab.Font.FontFamily, newSize - 2, lab.Font.Style);
+            return lab.Font;
         }
 
         private void SendSerial(List<OBSWebsocketDotNet.Types.SceneItem> SceneSources)
@@ -223,9 +255,8 @@ namespace OBSTallyClient
                 else if (source.SourceName == source2) { serialPort1.Write("1,"); }
                 else if (source.SourceName == source3) { serialPort1.Write("2,"); }
                 else if (source.SourceName == source4) { serialPort1.Write("3,"); }
-                else { serialPort1.Write("4,"); }
+                //else { serialPort1.Write("4,"); } //Out of range bit
             }
-            //serialPort1.Write("*"); // Send stop bit
             serialPort1.Write("*\r\n"); // Send stop bit
         }
 
@@ -233,7 +264,9 @@ namespace OBSTallyClient
         {
             label1.BackColor = color;   label2.BackColor = color;
             label3.BackColor = color;   label4.BackColor = color;
-            label5.BackColor = color;
+            
+            label5.BackColor = Color.Transparent;
+            label5.Text ="";
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -245,11 +278,20 @@ namespace OBSTallyClient
                 try
                 {
                     serialPort1.Open(); //Try opening the port to test connectivity
-                    label5.Text = serialPort1.PortName;
+                    label6.Text = serialPort1.PortName;
+                    label6.BackColor = Color.Green;
                     serialPort1.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived); //Initialize data recieved event handler
+                    
+                    // Notify Arduino of the change
+                    if (button2.Text == "Previews ON") // If previews are turned ON
+                    {
+                        serialPort1.Write("50,"); SendSerial(PreviewSceneSources); serialPort1.Write("*\r\n"); // Send preview scene serial bits to Arduino
+                    }
+                    serialPort1.Write("51,"); SendSerial(LiveSceneSources); serialPort1.Write("*\r\n"); // Send live scene serial bits to Arduino
                 }
                 catch
                 {
+                    label6.BackColor = Color.Red;
                     MessageBox.Show("Could not establish serial connection on " + comboBox1.Text, "Communication Error");
                 }
             }
@@ -259,11 +301,8 @@ namespace OBSTallyClient
         {
             // See example here: https://stackoverflow.com/questions/16215741/c-sharp-read-only-serial-port-when-data-comes
             // https://forum.arduino.cc/index.php?topic=40336.0
-            //if (serialPort1.ReadLine() != string.Empty)
-            //{
-                string line = serialPort1.ReadLine();
-                BeginInvoke(new LineReceivedEvent(LineReceived), line);
-            //}
+            string line = serialPort1.ReadLine();
+            BeginInvoke(new LineReceivedEvent(LineReceived), line);
         }
 
         private delegate void LineReceivedEvent(string line);
@@ -291,11 +330,6 @@ namespace OBSTallyClient
                 button2.Text = "Previews OFF";
             }
             button2_ClickCount = button2_ClickCount + 1;
-        }
-
-        private void label5_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void MainProgram_Resize(object sender, EventArgs e)
@@ -332,6 +366,6 @@ namespace OBSTallyClient
             XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
             wsPassword = wesPass.Attributes["password"].Value;
         }
- 
+
     }
 }

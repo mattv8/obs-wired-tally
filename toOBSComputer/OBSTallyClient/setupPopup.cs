@@ -7,7 +7,14 @@ namespace OBSTallyClient
 {
     public partial class setupPopup : Form
     {
-        public bool exitFlag = false;
+        // Public variables
+        public bool configComplete = false;
+        public string source1;
+        public string source2;
+        public string source3;
+        public string source4;
+        public string wsPassword;
+
         public setupPopup()
         {
             InitializeComponent();
@@ -43,7 +50,7 @@ namespace OBSTallyClient
             try
             {
                 xmlDoc.Save(Application.StartupPath + "\\config.xml");
-                this.exitFlag = true;
+                this.configComplete = true;
             }
             catch
             {
@@ -54,7 +61,40 @@ namespace OBSTallyClient
 
         private void setupPopup_Load(object sender, EventArgs e)
         {
+            try
+            {
+                loadConfigXML(); // Load the XML file, catch if it doesn't exist
+                textBox1.Text = source1;
+                textBox2.Text = source2;
+                textBox3.Text = source3;
+                textBox4.Text = source4;
+                textBox5.Text = wsPassword;
+            }
+            catch (FileNotFoundException ex1) //if Config doesn't exist, show setupPopup
+            {
 
+            }
+            catch
+            {
+
+            }
         }
+
+        private void loadConfigXML()
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(Application.StartupPath + "\\config.xml");
+            XmlNode first = xmlDoc.SelectSingleNode("root/Source1");
+            source1 = first.Attributes["name"].Value;
+            XmlNode second = xmlDoc.SelectSingleNode("root/Source2");
+            source2 = second.Attributes["name"].Value;
+            XmlNode third = xmlDoc.SelectSingleNode("root/Source3");
+            source3 = third.Attributes["name"].Value;
+            XmlNode fourth = xmlDoc.SelectSingleNode("root/Source4");
+            source4 = fourth.Attributes["name"].Value;
+            XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
+            wsPassword = wesPass.Attributes["password"].Value;
+        }
+
     }
 }

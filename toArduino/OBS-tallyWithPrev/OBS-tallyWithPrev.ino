@@ -55,7 +55,41 @@ int Idx2;
 int Idx3;
 int Idx4;
 
+// Misc Variables
+int numLive = 1; int numPreview = 1;
+
 // ------------------------FUNCTIONS------------------------ //
+
+// This function reads the incoming serial stream and parses it into respective variables.
+// We expect a string like  51,2,3,4*  or  50,2,*. For now, this only allows for up to 4
+// sources, but we can manually modify the code to allow for more.
+//   Serial Key:
+//   50  = Preview state change
+//   51  = Live state change
+//   0-3 = Live/Preview source range
+//   4   = Source is out of range
+//   ,   = Delimiter
+//   *   = Stop bit
+void readSerial () {
+
+  char *ptr;
+  int charsRead;
+
+  charsRead = Serial.readBytesUntil(',*', readString, sizeof(readString) - 1);
+  readString[charsRead] = '\0';
+
+  //Serial.print("Captured string is : "); Serial.println(readString);
+  //Serial.print("Length of string is : "); Serial.println(strlen(readString));
+
+  ptr = strtok(readString, ","); if (ptr != '\0') { startbit = atoi(ptr); }
+  ptr = strtok('\0', ",");       if (ptr != '\0') { Idx1 = atoi(ptr); } else { Idx1 = -1; }
+  ptr = strtok('\0', ",");       if (ptr != '\0') { Idx2 = atoi(ptr); } else { Idx2 = -1; }
+  ptr = strtok('\0', ",");       if (ptr != '\0') { Idx3 = atoi(ptr); } else { Idx3 = -1; }
+  ptr = strtok('\0', ",");       if (ptr != '\0') { Idx4 = atoi(ptr); } else { Idx4 = -1; }
+  
+  readString[0] = '\0'; //clears variable for new input
+  
+}
 
 // This function draws rainbows with an ever-changing, widely-varying set of parameters. 
 // Function credit goes to Mark Kriegsman (2015).
@@ -99,37 +133,6 @@ void rainbow() {
   }
 }
 
-// This function reads the incoming serial stream and parses it into respective variables.
-// We expect a string like  51,2,3,4*  or  50,2,*. For now, this only allows for up to 4
-// sources, but we can manually modify the code to allow for more.
-//   Serial Key:
-//   50  = Preview state change
-//   51  = Live state change
-//   1-4 = Live/Preview source range
-//   5   = Source is out of range
-//   ,   = Delimiter
-//   *   = Stop bit
-void readSerial () {
-
-  char *ptr;
-  int charsRead;
-
-  if (Serial.available())  {
-    charsRead = Serial.readBytesUntil(',*', readString, sizeof(readString) - 1);
-    readString[charsRead] = '\0';
-  }
-    //Serial.print("captured String is : "); Serial.println(readString);
-
-  ptr = strtok(readString, ","); if (ptr != '\0') { startbit = atoi(ptr); }
-  ptr = strtok('\0', ",");       if (ptr != '\0') { Idx1 = atoi(ptr); } else { Idx1 = -1; }
-  ptr = strtok('\0', ",");       if (ptr != '\0') { Idx2 = atoi(ptr); } else { Idx2 = -1; }
-  ptr = strtok('\0', ",");       if (ptr != '\0') { Idx3 = atoi(ptr); } else { Idx3 = -1; }
-  ptr = strtok('\0', ",");       if (ptr != '\0') { Idx4 = atoi(ptr); } else { Idx4 = -1; }
-
-  readString[0] = '\0'; //clears variable for new input
-  
-}
-
 // ------------------------SETUP LOOP------------------------------- //
 void setup() {
  
@@ -154,87 +157,61 @@ void loop(void) {
   ////////////// Perpetually Updating ///////////////
   //currentTime = millis(); // Update the master clock
 
-  //Bump up duty cycle for only 2 lights
-  FastLED.setBrightness(DUTY_CYCLE*.1);//10% duty cycle
-
   // Clear out all the LEDs upon serial state change
   SerialState = Serial.available();
   if (SerialState != lastSerialState) {
-    //FastLED.clear();
-    //fill_solid( leds, TOTAL_LEDS, CRGB::Black ); //Fill all LEDs black
+    FastLED.clear();
   }
   
   ////////////// Serial Communication ///////////////
-  //if(Serial.available()) { // Check if recieving data
+  if(Serial.available()) { // Check if recieving data
 
     readSerial(); // Record serial bits from incoming serial stream.
+    
     ////////////// Preview Range //////////////
-    if (startbit == 50) {
-      currentPreview1 = Idx1; currentPreview2 = Idx2; currentPreview3 = Idx3; currentPreview4 = Idx4;
-    }
+    if (startbit == 50) { currentPreview1 = Idx1; currentPreview2 = Idx2; currentPreview3 = Idx3; currentPreview4 = Idx4; }
     
     ////////////// Live Range //////////////
-    if (startbit == 51) {
-      currentLive1 = Idx1; currentLive2 = Idx2; currentLive3 = Idx3; currentLive4 = Idx4;
-    }
-
-    //Serial.print("Current previews: "); Serial.print(currentPreview1);  Serial.print(currentPreview2); Serial.print(currentPreview3); Serial.println(currentPreview4);
-    //Serial.print("Current lives: "); Serial.print(currentLive1);  Serial.print(currentLive2); Serial.print(currentLive3); Serial.println(currentLive4);
+    if (startbit == 51) { currentLive1 = Idx1; currentLive2 = Idx2; currentLive3 = Idx3; currentLive4 = Idx4; }
 
     ////////////// Tally Light States ///////////////
     // Preview State //
-    if(lastPreview1 >= 0 || lastPreview1 != currentPreview1){ 
-      fill_solid( ledarray[lastPreview1], NUM_LEDS, CRGB::Black );
-      lastPreview1 = currentPreview1;
-      }
-    if(lastPreview2 >= 0 || lastPreview2 != currentPreview2){
-      fill_solid( ledarray[lastPreview2], NUM_LEDS, CRGB::Black );
-      lastPreview2 = currentPreview2;
-      }
-    if(lastPreview3 >= 0 || lastPreview3 != currentPreview3){
-      fill_solid( ledarray[lastPreview3], NUM_LEDS, CRGB::Black );
-      lastPreview3 = currentPreview3;
-      }
-    if(lastPreview4 >= 0 || lastPreview4 != currentPreview4){
-      fill_solid( ledarray[lastPreview4], NUM_LEDS, CRGB::Black );
-      lastPreview4 = currentPreview4;
-      }
+    if(lastPreview1 >= 0 || lastPreview1 != currentPreview1){ fill_solid( ledarray[lastPreview1], NUM_LEDS, CRGB::Black ); lastPreview1 = currentPreview1; }
+    if(lastPreview2 >= 0 || lastPreview2 != currentPreview2){ fill_solid( ledarray[lastPreview2], NUM_LEDS, CRGB::Black ); lastPreview2 = currentPreview2; }
+    if(lastPreview3 >= 0 || lastPreview3 != currentPreview3){ fill_solid( ledarray[lastPreview3], NUM_LEDS, CRGB::Black ); lastPreview3 = currentPreview3; }
+    if(lastPreview4 >= 0 || lastPreview4 != currentPreview4){ fill_solid( ledarray[lastPreview4], NUM_LEDS, CRGB::Black ); lastPreview4 = currentPreview4; }
     
     // Live State //
-    if(lastLive1 >= 0 || lastLive1 != currentLive1){ 
-      fill_solid( ledarray[lastLive1], NUM_LEDS, CRGB::Black );
-      lastLive1 = currentLive1;
-      }
-    if(lastLive2 >= 0 || lastLive2 != currentLive2){
-      fill_solid( ledarray[lastLive2], NUM_LEDS, CRGB::Black );
-      lastLive2 = currentLive2;
-      }
-    if(lastLive3 >= 0 || lastLive3 != currentLive3){
-      fill_solid( ledarray[lastLive3], NUM_LEDS, CRGB::Black );
-      lastLive3 = currentLive3;}
-    if(lastLive4 >= 0 || lastLive4 != currentLive4){
-      fill_solid( ledarray[lastLive4], NUM_LEDS, CRGB::Black );
-      lastLive4 = currentLive4;}
+    if(lastLive1 >= 0 || lastLive1 != currentLive1){ fill_solid( ledarray[lastLive1], NUM_LEDS, CRGB::Black ); lastLive1 = currentLive1; }
+    if(lastLive2 >= 0 || lastLive2 != currentLive2){ fill_solid( ledarray[lastLive2], NUM_LEDS, CRGB::Black ); lastLive2 = currentLive2; }
+    if(lastLive3 >= 0 || lastLive3 != currentLive3){ fill_solid( ledarray[lastLive3], NUM_LEDS, CRGB::Black ); lastLive3 = currentLive3; }
+    if(lastLive4 >= 0 || lastLive4 != currentLive4){ fill_solid( ledarray[lastLive4], NUM_LEDS, CRGB::Black ); lastLive4 = currentLive4; }
 
-    if(currentPreview1 >= 0){ fill_solid( ledarray[currentPreview1], NUM_LEDS, CRGB::Green ); }
-    if(currentPreview2 >= 0){ fill_solid( ledarray[currentPreview2], NUM_LEDS, CRGB::Green ); }
-    if(currentPreview3 >= 0){ fill_solid( ledarray[currentPreview3], NUM_LEDS, CRGB::Green ); }
-    if(currentPreview4 >= 0){ fill_solid( ledarray[currentPreview4], NUM_LEDS, CRGB::Green ); }
+    // Continually update current previews
+    if(currentPreview1 >= 0){ fill_solid( ledarray[currentPreview1], NUM_LEDS, CRGB::Green ); numPreview = numPreview + 1; }
+    if(currentPreview2 >= 0){ fill_solid( ledarray[currentPreview2], NUM_LEDS, CRGB::Green ); numPreview = numPreview + 1; }
+    if(currentPreview3 >= 0){ fill_solid( ledarray[currentPreview3], NUM_LEDS, CRGB::Green ); numPreview = numPreview + 1; }
+    if(currentPreview4 >= 0){ fill_solid( ledarray[currentPreview4], NUM_LEDS, CRGB::Green ); numPreview = numPreview + 1; }
 
-    if(currentLive1 >= 0){ fill_solid( ledarray[currentLive1], NUM_LEDS, CRGB::Red ); }
-    if(currentLive2 >= 0){ fill_solid( ledarray[currentLive2], NUM_LEDS, CRGB::Red ); }
-    if(currentLive3 >= 0){ fill_solid( ledarray[currentLive3], NUM_LEDS, CRGB::Red ); }
-    if(currentLive4 >= 0){ fill_solid( ledarray[currentLive4], NUM_LEDS, CRGB::Red ); }
+    // Continually update current lives
+    if(currentLive1 >= 0){ fill_solid( ledarray[currentLive1], NUM_LEDS, CRGB::Red ); numLive = numLive + 1; }
+    if(currentLive2 >= 0){ fill_solid( ledarray[currentLive2], NUM_LEDS, CRGB::Red ); numLive = numLive + 1; }
+    if(currentLive3 >= 0){ fill_solid( ledarray[currentLive3], NUM_LEDS, CRGB::Red ); numLive = numLive + 1; }
+    if(currentLive4 >= 0){ fill_solid( ledarray[currentLive4], NUM_LEDS, CRGB::Red ); numLive = numLive + 1; }
+        
+    // Set duty cycle based on count of live and preview tallies
+    if ( numPreview > 0 && numPreview < 2 || numLive > 0 && numLive < 2 ) { FastLED.setBrightness(DUTY_CYCLE*.10); }// Only 2 lights, use 10% duty cycle
+    if ( numPreview >= 2 || numLive >= 2 ) { FastLED.setBrightness(DUTY_CYCLE*.05); }// 2 or more lights, use 5% duty cycle
+    numLive = 0; numPreview = 0; // Reset live/preview counters
 
-  //}else { //If not recieving any data
+  }else { //If not recieving any data
     
-    //FastLED.setBrightness(DUTY_CYCLE*.05);//5% duty cycle for all lights at once
-    //rainbow(); //Fill all LEDs with beautiful dancing rainbows while we wait for Serial
+    FastLED.setBrightness(DUTY_CYCLE*.05);//5% duty cycle for all lights at once
+    rainbow(); //Fill all LEDs with beautiful dancing rainbows while we wait for Serial
     
-  //}//End Serial.available()
+  }//End Serial.available()
 
   FastLED.show(); //Send LED color states to the LEDs
   lastSerialState = SerialState; //Update serial state
-  //delay(10); //Simple debounce delay
   
 }//End Void Loop

@@ -44,30 +44,31 @@ namespace OBSTallyClient
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.button2 = new System.Windows.Forms.Button();
             this.WSHeartbeat = new System.Windows.Forms.Timer(this.components);
+            this.label6 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
             // 
-            resources.ApplyResources(this.label1, "label1");
             this.label1.BackColor = System.Drawing.Color.Blue;
+            resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
             // 
             // label2
             // 
-            resources.ApplyResources(this.label2, "label2");
             this.label2.BackColor = System.Drawing.Color.Blue;
+            resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
             // 
             // label3
             // 
-            resources.ApplyResources(this.label3, "label3");
             this.label3.BackColor = System.Drawing.Color.Blue;
+            resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
             // 
             // label4
             // 
-            resources.ApplyResources(this.label4, "label4");
             this.label4.BackColor = System.Drawing.Color.Blue;
+            resources.ApplyResources(this.label4, "label4");
             this.label4.Name = "label4";
             // 
             // Main
@@ -105,7 +106,6 @@ namespace OBSTallyClient
             // 
             resources.ApplyResources(this.label5, "label5");
             this.label5.Name = "label5";
-            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // button1
             // 
@@ -133,10 +133,16 @@ namespace OBSTallyClient
             this.WSHeartbeat.Interval = 1000;
             this.WSHeartbeat.Tick += new System.EventHandler(this.WebsocketHeartbeat);
             // 
+            // label6
+            // 
+            resources.ApplyResources(this.label6, "label6");
+            this.label6.Name = "label6";
+            // 
             // MainProgram
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button1);
@@ -151,7 +157,6 @@ namespace OBSTallyClient
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Resize += new System.EventHandler(this.MainProgram_Resize);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -169,6 +174,7 @@ namespace OBSTallyClient
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Timer WSHeartbeat;
+        private System.Windows.Forms.Label label6;
     }
 }
 
