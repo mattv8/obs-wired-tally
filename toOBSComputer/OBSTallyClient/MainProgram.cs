@@ -131,6 +131,7 @@ namespace OBSTallyClient
                         {
                             //Console.WriteLine("Previews on."); //Debugging
                             RefreshLabels(PreviewSceneSources, Color.Green); //Refresh preview labels
+                            RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
 
                             // Notify Arduino of the change
@@ -157,7 +158,7 @@ namespace OBSTallyClient
                     {
                         if (lastbutton2State != button2_ClickCount) // If preview on/off toggle changes
                         {
-                            //Console.WriteLine("Previews off."); //Debugging
+                            Console.WriteLine("Previews off."); //Debugging
                             ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(LiveSceneSources, Color.Red); //Refresh live labels
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
@@ -291,7 +292,7 @@ namespace OBSTallyClient
                 }
                 catch
                 {
-                    label6.BackColor = Color.Red;
+                    label6.BackColor = Color.Blue;
                     MessageBox.Show("Could not establish serial connection on " + comboBox1.Text, "Communication Error");
                 }
             }
