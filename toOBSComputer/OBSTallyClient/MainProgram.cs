@@ -280,7 +280,7 @@ namespace OBSTallyClient
                 {
                     serialPort1.Open(); //Try opening the port to test connectivity
                     label6.Text = serialPort1.PortName;
-                    label6.BackColor = Color.Green;
+                    label6.BackColor = Color.Blue;
                     serialPort1.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived); //Initialize data recieved event handler
                     
                     // Notify Arduino of the change
@@ -292,7 +292,7 @@ namespace OBSTallyClient
                 }
                 catch
                 {
-                    label6.BackColor = Color.Blue;
+                    label6.BackColor = Color.Transparent;
                     MessageBox.Show("Could not establish serial connection on " + comboBox1.Text, "Communication Error");
                 }
             }
