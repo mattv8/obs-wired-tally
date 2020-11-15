@@ -113,8 +113,8 @@ namespace OBSTallyClient
                         //Console.WriteLine("Live state has changed"); //Debugging
                         // Update live label colors for UI app
                         ColorAllLabels(Color.Gray); //Gray out all labels
+                        if (button2.Text == "Previews ON") { RefreshLabels(PreviewSceneSources, Color.Green); } //Refresh preview labels
                         RefreshLabels(LiveSceneSources, Color.Red); //Refresh all live labels
-                        RefreshLabels(PreviewSceneSources, Color.Green); //Refresh preview labels
 
                         // Send write (LIVE)
                         serialPort1.Write("51,"); // Send live state change bit to Arduino
