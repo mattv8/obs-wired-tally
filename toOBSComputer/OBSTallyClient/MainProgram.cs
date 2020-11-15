@@ -44,7 +44,6 @@ namespace OBSTallyClient
             try
             {
                 loadConfigXML(); // Load the XML file, catch if it doesn't exist
-                configComplete = true;
             }
             catch (FileNotFoundException ex1) //if Config doesn't exist, show setupPopup
             {
@@ -54,7 +53,7 @@ namespace OBSTallyClient
                 if (setItUp.configComplete == true)
                 {
                     loadConfigXML();
-                    configComplete = true;
+                    messageShown = false;
                 }
             }
             catch
@@ -99,7 +98,7 @@ namespace OBSTallyClient
 
                 // Prevent running of websockets if config file doesn't exist.
                 // Otherwise these values initialize as nulls, and everything crashes.
-                if (configComplete == true && mainWebsocket.IsConnected && serialPort1 != null)
+                if (mainWebsocket.IsConnected && serialPort1 != null)
                 {
 
                     ////////////// Update Websocket Variables //////////////
@@ -111,10 +110,11 @@ namespace OBSTallyClient
                     ////////////// LIVE //////////////
                     if (currentLiveScene != lastLiveScene) //If live scene state changes
                     {
-                        Console.WriteLine("Live state has changed"); //Debugging
+                        //Console.WriteLine("Live state has changed"); //Debugging
                         // Update live label colors for UI app
                         ColorAllLabels(Color.Gray); //Gray out all labels
                         RefreshLabels(LiveSceneSources, Color.Red); //Refresh all live labels
+                        RefreshLabels(PreviewSceneSources, Color.Green); //Refresh preview labels
 
                         // Send write (LIVE)
                         serialPort1.Write("51,"); // Send live state change bit to Arduino
@@ -141,7 +141,7 @@ namespace OBSTallyClient
                         // Update preview label colors for UI app
                         if (currentPreviewScene != lastPreviewScene) //If preview scene state changes
                         {
-                            Console.WriteLine("Preview state has changed"); //Debugging
+                            //Console.WriteLine("Preview state has changed"); //Debugging
                             ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(PreviewSceneSources, Color.Green); //Set label colors for preview sources
                             RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
@@ -158,7 +158,7 @@ namespace OBSTallyClient
                     {
                         if (lastbutton2State != button2_ClickCount) // If preview on/off toggle changes
                         {
-                            Console.WriteLine("Previews off."); //Debugging
+                            //Console.WriteLine("Previews off."); //Debugging
                             ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(LiveSceneSources, Color.Red); //Refresh live labels
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
@@ -228,8 +228,8 @@ namespace OBSTallyClient
                 else if (source.SourceName == source4) { label4.BackColor = color; }
                 else {
                     label5.BackColor = color;
-                    if (color == Color.Red) { label5.Text = "Other live source in scene";  }
-                    if (color == Color.Green) { label5.Text = "Other preview source in scene";  }
+                    if (color == Color.Red) { label5.Text = "A non-tallied source is live.";  }
+                    if (color == Color.Green) { label5.Text = "A non-tallied source is in preview.";  }
                 }
             }
             
