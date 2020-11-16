@@ -227,7 +227,6 @@ namespace OBSTallyClient
                 else if (source.SourceName == source3) { label3.BackColor = color; }
                 else if (source.SourceName == source4) { label4.BackColor = color; }
                 else {
-                    label5.BackColor = color;
                     if (color == Color.Red) { label5.Text = "A non-tallied source is live.";  }
                     if (color == Color.Green) { label5.Text = "A non-tallied source is in preview.";  }
                 }
@@ -265,8 +264,6 @@ namespace OBSTallyClient
         {
             label1.BackColor = color;   label2.BackColor = color;
             label3.BackColor = color;   label4.BackColor = color;
-            
-            label5.BackColor = Color.Transparent;
             label5.Text ="";
         }
 
