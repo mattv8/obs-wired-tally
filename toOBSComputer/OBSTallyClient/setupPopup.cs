@@ -9,6 +9,8 @@ namespace OBSTallyClient
     {
         // Public variables
         public bool configComplete = false;
+        public string wsPort = "4444";
+        public string wsAddress = "127.0.0.1";
         public string source1;
         public string source2;
         public string source3;
@@ -18,6 +20,8 @@ namespace OBSTallyClient
         public setupPopup()
         {
             InitializeComponent();
+            textBox6.Text = wsAddress;
+            textBox7.Text = wsPort;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -47,6 +51,17 @@ namespace OBSTallyClient
             XmlAttribute ChildAtt5 = Child5.Attributes.Append(xmlDoc.CreateAttribute("name"));
             ChildAtt5.InnerText = textBox4.Text;
 
+            XmlNode Child6 = Root.AppendChild(xmlDoc.CreateElement("WebsocketAddress"));
+            XmlAttribute ChildAtt6 = Child6.Attributes.Append(xmlDoc.CreateAttribute("address"));
+
+            XmlNode Child7 = Root.AppendChild(xmlDoc.CreateElement("WebsocketPort"));
+            XmlAttribute ChildAtt7 = Child7.Attributes.Append(xmlDoc.CreateAttribute("port"));
+
+            if (textBox6.Text != wsAddress)  { ChildAtt6.InnerText = textBox6.Text; }
+            else { ChildAtt6.InnerText = wsAddress; }
+            if (textBox7.Text != wsPort) { ChildAtt7.InnerText = textBox7.Text; }
+            else { ChildAtt7.InnerText = wsPort; }
+
             try
             {
                 xmlDoc.Save(Application.StartupPath + "\\config.xml");
@@ -69,6 +84,8 @@ namespace OBSTallyClient
                 textBox3.Text = source3;
                 textBox4.Text = source4;
                 textBox5.Text = wsPassword;
+                textBox6.Text = wsAddress;
+                textBox7.Text = wsPort;
             }
             catch (FileNotFoundException ex1) //if Config doesn't exist, show setupPopup
             {
@@ -94,6 +111,10 @@ namespace OBSTallyClient
             source4 = fourth.Attributes["name"].Value;
             XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
             wsPassword = wesPass.Attributes["password"].Value;
+            XmlNode wesPort = xmlDoc.SelectSingleNode("root/WebsocketPort");
+            wsPort = wesPort.Attributes["port"].Value;
+            XmlNode wesAddress = xmlDoc.SelectSingleNode("root/WebsocketAddress");
+            wsAddress = wesAddress.Attributes["address"].Value;
         }
 
     }

@@ -16,6 +16,8 @@ namespace OBSTallyClient
         OBSWebsocket mainWebsocket = new OBSWebsocket();
 
         // Public variables
+        public string wsPort;
+        public string wsAddress;
         public string source1;
         public string source2;
         public string source3;
@@ -63,17 +65,20 @@ namespace OBSTallyClient
 
             try
             {
-                mainWebsocket.Connect("ws://127.0.0.1:4444", wsPassword);
+
+                mainWebsocket.WSTimeout = TimeSpan.FromSeconds(1);
+                mainWebsocket.Connect("ws://"+wsAddress+":"+wsPort, wsPassword);
                 if (mainWebsocket.IsConnected)
                 {
+
                     lastLiveScene = mainWebsocket.GetCurrentScene().Name; //Initialize lastLiveScene at the current live scene
-                    
+
                     //Update label text
                     label1.Text = source1; label1.Font = scaleFont(label1);
                     label2.Text = source2; label2.Font = scaleFont(label2);
                     label3.Text = source3; label3.Font = scaleFont(label3);
                     label4.Text = source4; label4.Font = scaleFont(label4);
-                    
+
                     RefreshLabels(PreviewSceneSources, Color.Green); //Set label colors for preview sources
                     RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
                 }
@@ -85,8 +90,8 @@ namespace OBSTallyClient
             }
             catch
             {
-                
             }
+
         }
 
         // Main loop //
@@ -110,7 +115,7 @@ namespace OBSTallyClient
                     ////////////// LIVE //////////////
                     if (currentLiveScene != lastLiveScene) //If live scene state changes
                     {
-                        //Console.WriteLine("Live state has changed"); //Debugging
+                        Console.WriteLine("Live state has changed"); //Debugging
                         // Update live label colors for UI app
                         ColorAllLabels(Color.Gray); //Gray out all labels
                         if (button2.Text == "Previews ON") { RefreshLabels(PreviewSceneSources, Color.Green); } //Refresh preview labels
@@ -129,7 +134,7 @@ namespace OBSTallyClient
                         // Update previews after prieview on/off is toggled
                         if (lastbutton2State != button2_ClickCount)
                         {
-                            //Console.WriteLine("Previews on."); //Debugging
+                            Console.WriteLine("Previews on."); //Debugging
                             RefreshLabels(PreviewSceneSources, Color.Green); //Refresh preview labels
                             RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
@@ -141,7 +146,7 @@ namespace OBSTallyClient
                         // Update preview label colors for UI app
                         if (currentPreviewScene != lastPreviewScene) //If preview scene state changes
                         {
-                            //Console.WriteLine("Preview state has changed"); //Debugging
+                            Console.WriteLine("Preview state has changed"); //Debugging
                             ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(PreviewSceneSources, Color.Green); //Set label colors for preview sources
                             RefreshLabels(LiveSceneSources, Color.Red); //Set label colors for live sources
@@ -158,7 +163,7 @@ namespace OBSTallyClient
                     {
                         if (lastbutton2State != button2_ClickCount) // If preview on/off toggle changes
                         {
-                            //Console.WriteLine("Previews off."); //Debugging
+                            Console.WriteLine("Previews off."); //Debugging
                             ColorAllLabels(Color.Gray); //Gray out all labels
                             RefreshLabels(LiveSceneSources, Color.Red); //Refresh live labels
                             lastbutton2State = button2_ClickCount; //Update lastbutton2State
@@ -200,8 +205,9 @@ namespace OBSTallyClient
                     messageShown = true; // Set messageShown flag to true
                     DialogResult result = MessageBox.Show("Please verify the following:\n" +
                         "1. OBS is open and running.\n" +
-                        "2. OBS Websockets is installed and enabled.\n\n" +
-                        "Would you like to attempt to reconnect?", "OBS TALLY: Lost connection to OBS",
+                        "2. OBS Websockets is installed and enabled.\n" +
+                        "3. You have entered the correct IP address and port.\n\n" +
+                        "Would you like to attempt to reconnect? If not, click \"No\", then run the setup again.", "OBS TALLY: Lost connection to OBS",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                     if (result == DialogResult.Yes)
                     {
@@ -210,7 +216,6 @@ namespace OBSTallyClient
                     }
                     else if (result == DialogResult.No)
                     {
-                        this.Close();
                     }
                 }
             }
@@ -363,6 +368,10 @@ namespace OBSTallyClient
             source4 = fourth.Attributes["name"].Value;
             XmlNode wesPass = xmlDoc.SelectSingleNode("root/Websocket");
             wsPassword = wesPass.Attributes["password"].Value;
+            XmlNode wesPort = xmlDoc.SelectSingleNode("root/WebsocketPort");
+            wsPort = wesPort.Attributes["port"].Value;
+            XmlNode wesAddress = xmlDoc.SelectSingleNode("root/WebsocketAddress");
+            wsAddress = wesAddress.Attributes["address"].Value;
         }
 
     }
