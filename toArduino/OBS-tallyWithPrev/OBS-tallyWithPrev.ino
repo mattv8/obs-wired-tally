@@ -48,7 +48,7 @@ int currentLive1; int currentLive2; int currentLive3; int currentLive4;
 int lastLive1; int lastLive2; int lastLive3; int lastLive4;
 
 // Serial Variables
-char readString[15];
+char readString[64];
 int startbit;
 int Idx1;
 int Idx2;
@@ -167,7 +167,7 @@ void loop(void) {
   if(Serial.available()) { // Check if recieving data
 
     readSerial(); // Record serial bits from incoming serial stream.
-    
+
     ////////////// Preview Range //////////////
     if (startbit == 50) { currentPreview1 = Idx1; currentPreview2 = Idx2; currentPreview3 = Idx3; currentPreview4 = Idx4; }
     
@@ -200,8 +200,9 @@ void loop(void) {
     if(currentLive4 >= 0){ fill_solid( ledarray[currentLive4], NUM_LEDS, CRGB::Red ); numLive = numLive + 1; }
         
     // Set duty cycle based on count of live and preview tallies
-    if ( numPreview > 0 && numPreview < 2 || numLive > 0 && numLive < 2 ) { FastLED.setBrightness(DUTY_CYCLE*.10); }// Only 2 lights, use 10% duty cycle
-    if ( numPreview >= 2 || numLive >= 2 ) { FastLED.setBrightness(DUTY_CYCLE*.05); }// 2 or more lights, use 5% duty cycle
+    if ( numPreview > 0 && numPreview <= 1 || numLive > 0 && numLive <= 1 ) { FastLED.setBrightness(DUTY_CYCLE*.50); }// Only 1 light, use 50% duty cycle
+    if ( numPreview > 1 && numPreview <= 2 || numLive > 1 && numLive <= 2 ) { FastLED.setBrightness(DUTY_CYCLE*.10); }// Only 2 lights, use 10% duty cycle
+    if ( numPreview > 2 || numLive > 2 ) { FastLED.setBrightness(DUTY_CYCLE*.05); }// 2 or more lights, use 5% duty cycle
     numLive = 0; numPreview = 0; // Reset live/preview counters
 
   }else { //If not recieving any data
