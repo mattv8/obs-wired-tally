@@ -1,4 +1,4 @@
-OBS Wired Tally Project
+THIS PROJECT IS DEPRECATED. PLEASE SEE THE FOLLOWING REPOSITORY FOR THE LATEST: https://github.com/mattv8/open-tally
 ==================================================
 
 Project Overview
